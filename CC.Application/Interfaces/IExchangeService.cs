@@ -5,7 +5,7 @@ using CC.Application.DTOs;
 
 namespace CC.Application.Interfaces
 {
-    public interface IFrankfurterService
+    public interface IExchangeService
     {
         Task<IResponseContract<ConvertServiceResponseDto>> ConvertAsync(ConvertRequest request);
         Task<IResponseContract<GetLatestExRateServiceResponseDto>> GetLatestExRateAsync(GetLatestExRateRequest request);

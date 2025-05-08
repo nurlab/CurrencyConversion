@@ -8,7 +8,7 @@ namespace CC.Presentation.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ConversionController(IConversionValidator validator, IFrankfurterService frankfurterService,IResponseContract<ConvertLatestResponse> convertLatestResponse, IResponseContract<GetRateHistoryServiceResponseDto> getRateHistoryResponse,IResponseContract<GetLatestExRateResponse> GetLatestExRateResponse) : ControllerBase
+    public class ConversionController(IConversionValidator validator, IExchangeService exchangeProviderService,IResponseContract<ConvertLatestResponse> convertLatestResponse, IResponseContract<GetRateHistoryServiceResponseDto> getRateHistoryResponse,IResponseContract<GetLatestExRateResponse> GetLatestExRateResponse) : ControllerBase
     {
 
         [HttpPost("get-Latest-exchange-rate", Name = "Get Latest Exchange Rate")]
@@ -18,10 +18,10 @@ namespace CC.Presentation.Controllers
             var validationResult = validator.Validate(request);
             if (!validationResult.IsSuccess) return GetLatestExRateResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
 
-            var frankfurterResult = await frankfurterService.GetLatestExRateAsync(request);
-            if (!frankfurterResult.IsSuccess) return GetLatestExRateResponse.ProcessErrorResponse(frankfurterResult.Messages, frankfurterResult.ErrorCode);
+            var exchangeProviderResult = await exchangeProviderService.GetLatestExRateAsync(request);
+            if (!exchangeProviderResult.IsSuccess) return GetLatestExRateResponse.ProcessErrorResponse(exchangeProviderResult.Messages, exchangeProviderResult.ErrorCode);
 
-            return GetLatestExRateResponse.ProcessSuccessResponse(new GetLatestExRateResponse(frankfurterResult.Data));
+            return GetLatestExRateResponse.ProcessSuccessResponse(new GetLatestExRateResponse(exchangeProviderResult.Data));
         }
 
         [HttpPost("convert", Name = "Convert")]
@@ -33,10 +33,10 @@ namespace CC.Presentation.Controllers
             var validationResult = validator.Validate(request);
             if (!validationResult.IsSuccess) return convertLatestResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
 
-            var frankfurterResult = await frankfurterService.ConvertAsync(request);
-            if (!frankfurterResult.IsSuccess) return convertLatestResponse.ProcessErrorResponse(frankfurterResult.Messages, frankfurterResult.ErrorCode);
+            var exchangeProviderResult = await exchangeProviderService.ConvertAsync(request);
+            if (!exchangeProviderResult.IsSuccess) return convertLatestResponse.ProcessErrorResponse(exchangeProviderResult.Messages, exchangeProviderResult.ErrorCode);
 
-            return convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponse(frankfurterResult.Data));
+            return convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponse(exchangeProviderResult.Data));
         }
 
         [HttpPost("get-rate-history", Name = "Get Rate History")]
@@ -45,10 +45,10 @@ namespace CC.Presentation.Controllers
             var validationResult = validator.Validate(request);
             if (!validationResult.IsSuccess) return getRateHistoryResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
 
-            var frankfurterResult = await frankfurterService.GetRateHistoryAsync(request);
-            if (!frankfurterResult.IsSuccess) return getRateHistoryResponse.ProcessErrorResponse(frankfurterResult.Messages, frankfurterResult.ErrorCode);
+            var exchangeProviderResult = await exchangeProviderService.GetRateHistoryAsync(request);
+            if (!exchangeProviderResult.IsSuccess) return getRateHistoryResponse.ProcessErrorResponse(exchangeProviderResult.Messages, exchangeProviderResult.ErrorCode);
 
-            return getRateHistoryResponse.ProcessSuccessResponse(new GetRateHistoryServiceResponseDto(frankfurterResult.Data));
+            return getRateHistoryResponse.ProcessSuccessResponse(new GetRateHistoryServiceResponseDto(exchangeProviderResult.Data));
         }
     }
 }

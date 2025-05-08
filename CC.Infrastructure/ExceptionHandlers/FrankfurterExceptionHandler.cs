@@ -16,10 +16,10 @@ namespace CC.Application.ExceptionHandlers
         {
             return ex switch
             {
-                HttpRequestException => (["HTTP request failed after retries."], ErrorCodes.FRANKFURTER_HTTP_ERROR),
-                JsonException => (["Failed to parse response."], ErrorCodes.FRANKFURTER_JSON_ERROR),
-                TaskCanceledException => (["Request timed out."], ErrorCodes.FRANKFURTER_TIMEOUT),
-                _ => (["An unexpected error occurred."], ErrorCodes.FRANKFURTER_UNEXPECTED)
+                HttpRequestException => (["HTTP request failed after retries."], ErrorCodes.EXCHANGE_INTEGRATION_HTTP_ERROR),
+                JsonException => (["Failed to parse response."], ErrorCodes.EXCHANGE_INTEGRATION_JSON_ERROR),
+                TaskCanceledException => (["Request timed out."], ErrorCodes.EXCHANGE_INTEGRATION_TIMEOUT),
+                _ => (["An unexpected error occurred."], ErrorCodes.EXCHANGE_INTEGRATION_UNEXPECTED)
             };
         }
     }

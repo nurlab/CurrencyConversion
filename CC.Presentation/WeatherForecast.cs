@@ -1,4 +1,4 @@
-namespace CC.Application
+namespace CC.Presentation
 {
     public class WeatherForecast
     {

@@ -19,9 +19,6 @@ namespace CC.Presentation
                    .As<IConversionValidator>()
                    .InstancePerLifetimeScope();
 
-            builder.RegisterType<FrankfurterService>()
-                   .As<IFrankfurterService>()
-                   .InstancePerLifetimeScope();
 
         }
     }

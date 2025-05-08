@@ -46,19 +46,16 @@ namespace CC.Infrastructure
                 .As(typeof(IExceptionHandler<>))
                 .InstancePerLifetimeScope();
             
-            // 3. Register response contracts
             builder.RegisterGeneric(typeof(ResponseContract<>))
                 .As(typeof(IResponseContract<>))
                 .InstancePerLifetimeScope();
 
-            // 4. Register validator
             builder.RegisterType<ConversionValidator>()
                 .As<IConversionValidator>()
                 .InstancePerLifetimeScope();
 
-            // 5. Register FrankfurterService (ONCE)
             builder.RegisterType<FrankfurterService>()
-                .As<IFrankfurterService>()
+                .As<IExchangeService>()
                 .InstancePerLifetimeScope();
         }
 

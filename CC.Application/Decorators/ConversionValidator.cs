@@ -28,17 +28,17 @@ namespace CC.Application.Decorators
             // Defensive validation
             if (string.IsNullOrWhiteSpace(request.FromCurrency) || string.IsNullOrWhiteSpace(request.ToCurrency))
             {
-                return responseContract.ProcessErrorResponse(["Currency codes must not be null or empty."], ErrorCodes.FRANKFURTER_VALIDATION_ERROR);
+                return responseContract.ProcessErrorResponse(["Currency codes must not be null or empty."], ErrorCodes.EXCHANGE_INTEGRATION_VALIDATION_ERROR);
             }
 
             if (!Regex.IsMatch(request.FromCurrency, @"^[A-Z]{3}$") || !Regex.IsMatch(request.ToCurrency, @"^[A-Z]{3}$"))
             {
-                return responseContract.ProcessErrorResponse(["Currency codes must be 3 uppercase letters."], ErrorCodes.FRANKFURTER_VALIDATION_ERROR);
+                return responseContract.ProcessErrorResponse(["Currency codes must be 3 uppercase letters."], ErrorCodes.EXCHANGE_INTEGRATION_VALIDATION_ERROR);
             }
 
             if (request.Amount <= 0)
             {
-                return responseContract.ProcessErrorResponse(["Amount must be greater than zero."], ErrorCodes.FRANKFURTER_VALIDATION_ERROR);
+                return responseContract.ProcessErrorResponse(["Amount must be greater than zero."], ErrorCodes.EXCHANGE_INTEGRATION_VALIDATION_ERROR);
             }
 
             return responseContract.ProcessSuccessResponse(null);
@@ -55,13 +55,13 @@ namespace CC.Application.Decorators
                 return responseContract.ProcessErrorResponse(["Invalid request"], ErrorCodes.INVALID_REQUEST);
 
             if (request.StartDate > request.EndDate)
-                return responseContract.ProcessErrorResponse(["Invalid date range"], ErrorCodes.FRANKFURTER_INVALID_DATE_RANGE);
+                return responseContract.ProcessErrorResponse(["Invalid date range"], ErrorCodes.EXCHANGE_INTEGRATION_INVALID_DATE_RANGE);
 
             if (request.EndDate > DateTime.UtcNow.Date)
-                return responseContract.ProcessErrorResponse(["EndDate cannot be in the future"], ErrorCodes.FRANKFURTER_INVALID_DATE_RANGE);
+                return responseContract.ProcessErrorResponse(["EndDate cannot be in the future"], ErrorCodes.EXCHANGE_INTEGRATION_INVALID_DATE_RANGE);
 
             if ((request.EndDate - request.StartDate).TotalDays > _maxRangeInDays)
-                return responseContract.ProcessErrorResponse([$"Date range must not exceed {_maxRangeInDays} days."], ErrorCodes.FRANKFURTER_INVALID_DATE_RANGE);
+                return responseContract.ProcessErrorResponse([$"Date range must not exceed {_maxRangeInDays} days."], ErrorCodes.EXCHANGE_INTEGRATION_INVALID_DATE_RANGE);
 
             return responseContract.ProcessSuccessResponse(null);
 

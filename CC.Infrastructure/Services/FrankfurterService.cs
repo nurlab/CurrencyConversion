@@ -8,7 +8,7 @@ using Polly;
 using System.Text.Json;
 
 namespace CC.Infrastructure.Services;
-public class FrankfurterService : IFrankfurterService
+public class FrankfurterService : IExchangeService
 {
     private readonly HttpClient _httpClient;
     private readonly IAsyncPolicy<HttpResponseMessage> _retryPolicy;
@@ -55,13 +55,13 @@ public class FrankfurterService : IFrankfurterService
                 });
 
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var exchangeRate = JsonSerializer.Deserialize<FrankfurterExRateAPIResponse>(jsonString);
+                var exchangeRate = JsonSerializer.Deserialize<ExchangeRateAPIResponse>(jsonString);
 
                 if (exchangeRate?.Rates == null || !exchangeRate.Rates.TryGetValue(request.ToCurrency, out rate))
                 {
                     return _convertServiceResult.ProcessErrorResponse(
                         [$"Exchange rate {request.ToCurrency} not supported by 3rd Party API."],
-                        ErrorCodes.FRANKFURTER_RATE_NOT_FOUND
+                        ErrorCodes.EXCHANGE_INTEGRATION_RATE_NOT_FOUND
                     );
                 }
 
@@ -95,13 +95,13 @@ public class FrankfurterService : IFrankfurterService
                 });
 
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var exchangeRate = JsonSerializer.Deserialize<FrankfurterExRateAPIResponse>(jsonString);
+                var exchangeRate = JsonSerializer.Deserialize<ExchangeRateAPIResponse>(jsonString);
 
                 if (exchangeRate?.Rates == null)
                 {
                     return _latestExRateServiceResult.ProcessErrorResponse(
                         [$"Exchange rate {request.Currency} not supported by 3rd Party API."],
-                        ErrorCodes.FRANKFURTER_RATE_NOT_FOUND
+                        ErrorCodes.EXCHANGE_INTEGRATION_RATE_NOT_FOUND
                     );
                 }
 
@@ -151,7 +151,7 @@ public class FrankfurterService : IFrankfurterService
                 {
                     return _rateHistoryServiceResult.ProcessErrorResponse(
                         ["Failed to deserialize exchange rate history."],
-                        ErrorCodes.FRANKFURTER_JSON_ERROR);
+                        ErrorCodes.EXCHANGE_INTEGRATION_JSON_ERROR);
                 }
 
                 _memoryCache.Set(cacheKey, cachedData, TimeSpan.FromMinutes(10));
@@ -163,7 +163,7 @@ public class FrankfurterService : IFrankfurterService
         {
             return _rateHistoryServiceResult.ProcessErrorResponse(
                 ["Invalid date range"],
-                ErrorCodes.FRANKFURTER_INVALID_DATE_RANGE);
+                ErrorCodes.EXCHANGE_INTEGRATION_INVALID_DATE_RANGE);
         }
         catch (Exception ex)
         {

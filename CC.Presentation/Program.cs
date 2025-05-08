@@ -5,6 +5,9 @@ using CC.Application.Interfaces;
 using CC.Infrastructure;
 using CC.Presentation;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.Extensions.Http;
+using Polly.Registry;
+using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +27,7 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterModule(new InfrastructureModule());
     containerBuilder.RegisterModule(new PresentationModule());
 });
+
 
 var app = builder.Build();
 

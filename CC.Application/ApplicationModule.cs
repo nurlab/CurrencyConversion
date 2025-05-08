@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using CC.Application.Contracts;
 using CC.Application.Decorators;
-using CC.Application.Interfaces;
+ using CC.Application.Interfaces;
 
 namespace CC.Application
 {
@@ -13,6 +13,8 @@ namespace CC.Application
             builder.RegisterGeneric(typeof(ResponseContract<>))
                    .As(typeof(IResponseContract<>))
                    .InstancePerLifetimeScope();
+
+   
 
             builder.RegisterType<ConversionValidator>()
                    .As<IConversionValidator>()

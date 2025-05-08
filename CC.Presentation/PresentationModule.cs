@@ -14,11 +14,10 @@ namespace CC.Presentation
                    .As(typeof(IResponseContract<>))
                    .InstancePerLifetimeScope();
 
-            // Register ConversionValidator directly
             builder.RegisterType<ConversionValidator>()
                    .As<IConversionValidator>()
                    .InstancePerLifetimeScope();
-            // Register ConversionValidator directly
+
             builder.RegisterType<FrankfurterService>()
                    .As<IFrankfurterService>()
                    .InstancePerLifetimeScope();

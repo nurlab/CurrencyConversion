@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CC.Application.DTOs
 {
-    public class ExchangeRateResponse
+    public class FrankfurterExRateAPIResponse
     {
         [JsonPropertyName("amount")]
         public decimal Amount { get; set; }

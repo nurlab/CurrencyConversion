@@ -6,7 +6,8 @@ namespace CC.Application.Interfaces
 {
     public interface IConversionValidator
     {
-        IResponseContract<object> Validate(ConvertLatestRequest request);
+        IResponseContract<object> Validate(ConvertRequest request);
         IResponseContract<object> Validate(GetRateHistoryRequest request);
+        IResponseContract<object> Validate(GetLatestExRateRequest request);
     }
 }

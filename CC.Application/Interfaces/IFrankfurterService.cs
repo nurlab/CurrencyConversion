@@ -7,7 +7,8 @@ namespace CC.Application.Interfaces
 {
     public interface IFrankfurterService
     {
-        Task<IResponseContract<ConvertServiceResponseDto>> ConvertAsync(ConvertLatestRequest request);
+        Task<IResponseContract<ConvertServiceResponseDto>> ConvertAsync(ConvertRequest request);
+        Task<IResponseContract<GetLatestExRateServiceResponseDto>> GetLatestExRateAsync(GetLatestExRateRequest request);
         Task<IResponseContract<GetRateHistoryServiceResponseDto>> GetRateHistoryAsync(GetRateHistoryRequest request);
     }
 }

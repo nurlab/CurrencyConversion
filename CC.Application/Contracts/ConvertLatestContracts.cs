@@ -12,7 +12,7 @@ namespace CC.Application.Contracts
     /// <summary>
     /// Represents a currency conversion request.
     /// </summary>
-    public class ConvertLatestRequest
+    public class ConvertRequest
     {
         /// <summary>
         /// The 3-letter ISO currency code to convert from. Must be a valid, non-empty currency code.

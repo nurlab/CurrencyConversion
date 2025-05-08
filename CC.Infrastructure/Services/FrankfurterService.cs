@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 using static CC.Infrastructure.Services.FrankfurterService;
 
 namespace CC.Infrastructure.Services;
-public class FrankfurterService(IResponseContract<ConvertServiceResponseDto> convertServiceResult, IResponseContract<GetRateHistoryServiceResponseDto> getRateHistoryServiceResult) : IFrankfurterService
+public class FrankfurterService(IResponseContract<ConvertServiceResponseDto> convertServiceResult, IResponseContract<GetRateHistoryServiceResponseDto> getRateHistoryServiceResult, IResponseContract<GetLatestExRateServiceResponseDto>  getLatestExRateServiceResult  ) : IFrankfurterService
 {
     private static readonly HttpClient client = new HttpClient();
-    public async Task<IResponseContract<ConvertServiceResponseDto>> ConvertAsync(ConvertLatestRequest request)
+    public async Task<IResponseContract<ConvertServiceResponseDto>> ConvertAsync(ConvertRequest request)
     {
         try
         {
@@ -24,7 +24,7 @@ public class FrankfurterService(IResponseContract<ConvertServiceResponseDto> con
             response.EnsureSuccessStatusCode();
 
             var jsonString = await response.Content.ReadAsStringAsync();
-            var exchangeRate = JsonSerializer.Deserialize<ExchangeRateResponse>(jsonString);
+            var exchangeRate = JsonSerializer.Deserialize<FrankfurterExRateAPIResponse>(jsonString);
 
             if (exchangeRate?.Rates == null || !exchangeRate.Rates.TryGetValue(request.ToCurrency, out var rate))
             {
@@ -53,6 +53,35 @@ public class FrankfurterService(IResponseContract<ConvertServiceResponseDto> con
 
     }
 
+    public async Task<IResponseContract<GetLatestExRateServiceResponseDto>> GetLatestExRateAsync(GetLatestExRateRequest request)
+    {
+        try
+        {
+            var url = $"https://api.frankfurter.dev/v1/latest?base={request.Currency}";
+
+            var response = await client.GetAsync(url);
+            response.EnsureSuccessStatusCode();
+
+            var jsonString = await response.Content.ReadAsStringAsync();
+            var exchangeRate = JsonSerializer.Deserialize<FrankfurterExRateAPIResponse>(jsonString);
+
+            if (exchangeRate?.Rates == null)
+            {
+                return getLatestExRateServiceResult.ProcessErrorResponse(
+                    [$"Exchange rate {request.Currency} not supported by 3rd Party API."],
+                    ErrorCodes.FRANKFURTER_RATE_NOT_FOUND
+                );
+            }
+
+            return getLatestExRateServiceResult.ProcessSuccessResponse(new GetLatestExRateServiceResponseDto(exchangeRate?.Rates, request.Currency));
+        }
+        catch (HttpRequestException ex) { return getLatestExRateServiceResult.ProcessErrorResponse(["HTTP request to Frankfurter API failed."], ErrorCodes.FRANKFURTER_HTTP_ERROR); }
+        catch (JsonException) { return getLatestExRateServiceResult.ProcessErrorResponse(["Failed to parse exchange rate response."], ErrorCodes.FRANKFURTER_JSON_ERROR); }
+        catch (TaskCanceledException) { return getLatestExRateServiceResult.ProcessErrorResponse(["Frankfurter API request timed out."], ErrorCodes.FRANKFURTER_TIMEOUT); }
+        catch (Exception) { return getLatestExRateServiceResult.ProcessErrorResponse(["An unexpected error occurred during conversion."], ErrorCodes.FRANKFURTER_UNEXPECTED); }
+
+    }
+
     public async Task<IResponseContract<GetRateHistoryServiceResponseDto>> GetRateHistoryAsync(GetRateHistoryRequest request)
     {
         try
@@ -75,10 +104,7 @@ public class FrankfurterService(IResponseContract<ConvertServiceResponseDto> con
                 }
                 else
                 {
-                    return getRateHistoryServiceResult.ProcessErrorResponse(
-                          ["Invalid date range"],
-                          ErrorCodes.FRANKFURTER_INVALID_DATE_RANGE
-                      );
+                    return getRateHistoryServiceResult.ProcessErrorResponse(["Invalid date range"],ErrorCodes.FRANKFURTER_INVALID_DATE_RANGE);
                 }
             }
         }
@@ -87,5 +113,7 @@ public class FrankfurterService(IResponseContract<ConvertServiceResponseDto> con
         catch (TaskCanceledException) { return getRateHistoryServiceResult.ProcessErrorResponse(["Frankfurter API request timed out."], ErrorCodes.FRANKFURTER_TIMEOUT); }
         catch (Exception) { return getRateHistoryServiceResult.ProcessErrorResponse(["An unexpected error occurred during conversion."], ErrorCodes.FRANKFURTER_UNEXPECTED); }
     }
+
+
 
 }

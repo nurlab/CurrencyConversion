@@ -17,7 +17,7 @@ namespace CC.Application.Decorators
         private readonly HashSet<string> _blocked = new() { "TRY", "PLN", "THB", "MXN" };
         private readonly int _maxRangeInDays = 365;
 
-        public IResponseContract<object> Validate(ConvertLatestRequest request)
+        public IResponseContract<object> Validate(ConvertRequest request)
         {
             if (request == null)
                 return responseContract.ProcessErrorResponse(["Invalid request"], ErrorCodes.INVALID_REQUEST);
@@ -66,6 +66,13 @@ namespace CC.Application.Decorators
             return responseContract.ProcessSuccessResponse(null);
 
         }
+        public IResponseContract<object> Validate(GetLatestExRateRequest request)
+        {
+            if (request == null)
+                return responseContract.ProcessErrorResponse(["Invalid request"], ErrorCodes.INVALID_REQUEST);
 
+            return responseContract.ProcessSuccessResponse(null);
+
+        }
     }
 }

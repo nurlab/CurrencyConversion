@@ -4,12 +4,12 @@ namespace CC.Application.DTOs
     /// <summary>
     /// Represents the result of a currency conversion operation.
     /// </summary>
-    public class ConvertServiceResponseDto
+    public class GetLatestExRateServiceResponseDto
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConvertServiceResponseDto"/> class.
         /// </summary>
-        public ConvertServiceResponseDto()
+        public GetLatestExRateServiceResponseDto()
         {
         }
 
@@ -17,15 +17,14 @@ namespace CC.Application.DTOs
         /// Initializes a new instance of the <see cref="ConvertServiceResponseDto"/> class with a specified amount.
         /// </summary>
         /// <param name="amount">The converted amount.</param>
-        public ConvertServiceResponseDto(decimal amount, string currency)
+        public GetLatestExRateServiceResponseDto(Dictionary<string, decimal> rates, string currency)
         {
-            Amount = amount;
-            Currency = currency;
+            Rates = rates;
+            Currency = currency ?? throw new ArgumentNullException(nameof(currency), "Currency cannot be null");
         }
-
         /// <summary>
         /// Gets or sets the converted amount.
-        public decimal Amount { get; set; }
+        public Dictionary<string, decimal> Rates { get; set; } = new();
         public string Currency { get; set; }
     }
 

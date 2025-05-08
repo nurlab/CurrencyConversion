@@ -1,4 +1,5 @@
-﻿namespace CC.Application.Interfaces
+﻿
+namespace CC.Application.Interfaces
 {
     /// <summary>
     /// Represents a contract for encapsulating the outcome of an operation,
@@ -27,6 +28,7 @@
         /// </summary>
         string ErrorCode { get; set; }
 
+        IResponseContract<T> HandleException(Exception ex);
         IResponseContract<T> ProcessErrorResponse(List<string> messages, string ErrorCode);
         IResponseContract<T> ProcessSuccessResponse(T data);
         IResponseContract<T> ProcessSuccessResponse(T data, List<string> messages);

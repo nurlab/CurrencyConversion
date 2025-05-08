@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using CC.Application.Contracts;
 using CC.Application.Decorators;
+using CC.Application.ExceptionHandlers;
 using CC.Application.Interfaces;
 using CC.Infrastructure.Services;
 

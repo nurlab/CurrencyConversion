@@ -3,6 +3,7 @@ using CC.Application.Contracts;
 using CC.Application.Decorators;
 using CC.Application.ExceptionHandlers;
 using CC.Application.Interfaces;
+using CC.Infrastructure.Factory;
 using CC.Infrastructure.Services;
 using Microsoft.Extensions.Http;
 using Polly;
@@ -64,7 +65,9 @@ public class InfrastructureModule : Module
         builder.RegisterType<ConversionValidator>()
             .As<IConversionValidator>()
             .InstancePerLifetimeScope();
-
+        builder.RegisterType<ExchangeServiceFactory>()
+            .As<IExchangeServiceFactory>()
+            .InstancePerLifetimeScope();
         builder.RegisterType<FrankfurterService>()
             .As<IExchangeService>()
             .InstancePerLifetimeScope();

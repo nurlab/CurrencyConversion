@@ -1,10 +1,12 @@
-﻿using CC.Application.Constants;
+﻿using CC.Application.Configrations;
+using CC.Application.Constants;
 using CC.Application.Contracts;
 using CC.Application.DTOs;
 using CC.Application.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
-using Polly.Registry;
+using Microsoft.Extensions.Options;
 using Polly;
+using Polly.Registry;
 using System.Text.Json;
 
 namespace CC.Infrastructure.Services;
@@ -33,6 +35,7 @@ public class FrankfurterService : IExchangeService
     private readonly IResponseContract<ConvertServiceResponseDto> _convertServiceResult;
     private readonly IResponseContract<GetRateHistoryServiceResponseDto> _rateHistoryServiceResult;
     private readonly IResponseContract<GetLatestExRateServiceResponseDto> _latestExRateServiceResult;
+    private readonly ExchangeProviderSettings _providerSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FrankfurterService"/> class.
@@ -50,13 +53,15 @@ public class FrankfurterService : IExchangeService
         IMemoryCache memoryCache,
         IResponseContract<ConvertServiceResponseDto> convertServiceResult,
         IResponseContract<GetRateHistoryServiceResponseDto> rateHistoryServiceResult,
-        IResponseContract<GetLatestExRateServiceResponseDto> latestExRateServiceResult)
+        IResponseContract<GetLatestExRateServiceResponseDto> latestExRateServiceResult,
+        IOptions<ExchangeProviderSettings> providerSettings)
     {
         _httpClient = httpClient;
         _memoryCache = memoryCache;
         _convertServiceResult = convertServiceResult;
         _rateHistoryServiceResult = rateHistoryServiceResult;
         _latestExRateServiceResult = latestExRateServiceResult;
+        _providerSettings = providerSettings.Value;
 
         if (!policyRegistry.TryGet<IAsyncPolicy<HttpResponseMessage>>("HttpRetryPolicy", out var retryPolicy))
         {
@@ -73,7 +78,7 @@ public class FrankfurterService : IExchangeService
             var cacheKey = $"fx:{request.FromCurrency}:{request.ToCurrency}";
             if (!_memoryCache.TryGetValue(cacheKey, out decimal rate))
             {
-                var url = $"https://api.frankfurter.dev/v1/latest?base={request.FromCurrency}&symbols={request.ToCurrency}";
+                var url = $"{_providerSettings.FrankfurterBaseUrl}/latest?base={request.FromCurrency}&symbols={request.ToCurrency}";
 
                 var response = await _retryPolicy.ExecuteAsync(async () =>
                 {
@@ -114,7 +119,7 @@ public class FrankfurterService : IExchangeService
             var cacheKey = $"fx-latest:{request.Currency}";
             if (!_memoryCache.TryGetValue(cacheKey, out Dictionary<string, decimal> rates))
             {
-                var url = $"https://api.frankfurter.dev/v1/latest?base={request.Currency}";
+                var url = $"{_providerSettings.FrankfurterBaseUrl}/latest?base={request.Currency}";
 
                 var response = await _retryPolicy.ExecuteAsync(async () =>
                 {
@@ -159,7 +164,7 @@ public class FrankfurterService : IExchangeService
 
             if (!_memoryCache.TryGetValue(cacheKey, out GetRateHistoryServiceResponseDto cachedData))
             {
-                var url = $"https://api.frankfurter.dev/v1/{startDateFormatted}..{endDateFormatted}?base={request.Currency}&page={request.PageNumber}&page_size={request.PageSize}";
+                var url = $"{_providerSettings.FrankfurterBaseUrl}/{startDateFormatted}..{endDateFormatted}?base={request.Currency}&page={request.PageNumber}&page_size={request.PageSize}";
 
                 var response = await _retryPolicy.ExecuteAsync(async () =>
                 {

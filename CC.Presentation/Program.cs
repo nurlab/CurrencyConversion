@@ -1,13 +1,9 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CC.Application;
-using CC.Application.Interfaces;
+using CC.Application.Configrations;
 using CC.Infrastructure;
 using CC.Presentation;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.Extensions.Http;
-using Polly.Registry;
-using Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +23,18 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
     containerBuilder.RegisterModule(new InfrastructureModule());
     containerBuilder.RegisterModule(new PresentationModule());
 });
+
+var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
+
+var configurationBuilder = new ConfigurationBuilder()
+    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true) // Default settings
+.AddJsonFile($"appsettings.{environment}.json", optional: true, reloadOnChange: true) // Environment-specific settings
+    .AddEnvironmentVariables()
+    .AddCommandLine(args);
+IConfiguration configuration = configurationBuilder.Build();
+builder.Configuration.AddConfiguration(configuration);
+builder.Services.Configure<ExchangeProviderSettings>(configuration.GetSection("ExchangeProviderSettings"));
 
 
 var app = builder.Build();

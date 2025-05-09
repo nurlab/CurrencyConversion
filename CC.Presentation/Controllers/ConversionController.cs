@@ -2,7 +2,6 @@
 using CC.Application.DTOs;
 using CC.Application.Enums;
 using CC.Application.Interfaces;
-using CC.Infrastructure.Factory;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CC.Presentation.Controllers;

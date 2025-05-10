@@ -60,4 +60,21 @@ public static class ErrorCodes
     /// <summary>Invalid date range provided for historical rate request</summary>
     public const string EXCHANGE_INTEGRATION_INVALID_DATE_RANGE = "EXCHANGE_INTEGRATION_INVALID_DATE_RANGE";
     #endregion
+
+    #region Account and Security
+    /// <summary>HTTP communication failure with exchange service</summary>
+    public const string SECURITY_SIGNIN_FAILED = "SECURITY_SIGNIN_FAILED";
+
+    /// <summary>User account was not found in the system</summary>
+    public const string SECURITY_USER_NOT_FOUND = "ERR_USER_NOT_FOUND";
+
+    /// <summary>User account found in the system</summary>
+    public const string SECURITY_USER_ALREADY_EXISTS = "ERR_USER_ALREADY_EXISTS";
+
+    /// <summary>User account exists but is not in active state</summary>
+    public const string SECURITY_USER_NOT_ACTIVE = "ERR_USER_NOT_ACTIVE";
+
+    /// <summary>User signup failed due to invalid or duplicate credentials</summary>
+    public const string SECURITY_SIGNUP_FAILED = "SECURITY_SIGNUP_FAILED";
+    #endregion
 }

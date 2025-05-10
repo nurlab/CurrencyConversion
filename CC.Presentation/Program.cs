@@ -1,9 +1,14 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using CC.Application;
 using CC.Application.Configrations;
-using CC.Infrastructure;
 using CC.Presentation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,13 +21,50 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
+//services.AddDbContext<AppDbContext>(options =>
+//    options.UseSqlite($"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "AppDb.db")}"));
+
+var cert = new X509Certificate2(
+    builder.Configuration["SecuritySettings:CertificatePath"],
+    builder.Configuration["SecuritySettings:CertificatePassword"]
+);
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.SaveToken = true;
+    options.RequireHttpsMetadata = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new X509SecurityKey(cert)
+    };
+});
+
 builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     // Register modules from each layer
     containerBuilder.RegisterModule(new ApplicationModule());
-    containerBuilder.RegisterModule(new InfrastructureModule());
+    containerBuilder.RegisterAssemblyModules(Assembly.Load("CC.Infrastructure"));
     containerBuilder.RegisterModule(new PresentationModule());
 });
+
+var mapperConfig = new MapperConfiguration(mc =>
+{
+    mc.AddProfile(new ApplicationMappingProfile());
+});
+
+IMapper mapper = mapperConfig.CreateMapper();
 
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 

@@ -3,8 +3,9 @@ using CC.Application.Contracts;
 using CC.Application.Decorators;
 using CC.Application.ExceptionHandlers;
 using CC.Application.Interfaces;
+using CC.Domain.Interfaces;
 using CC.Infrastructure.Factory;
-using CC.Infrastructure.Services;
+using CC.Infrastructure.Services.Conversion;
 using Microsoft.Extensions.Http;
 using Polly;
 using Polly.Registry;
@@ -68,7 +69,7 @@ public class InfrastructureModule : Module
         builder.RegisterType<ExchangeServiceFactory>()
             .As<IExchangeServiceFactory>()
             .InstancePerLifetimeScope();
-        builder.RegisterType<FrankfurterService>()
+        builder.RegisterType<FrankfurterProvider>()
             .As<IExchangeService>()
             .InstancePerLifetimeScope();
     }

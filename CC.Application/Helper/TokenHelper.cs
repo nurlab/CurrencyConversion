@@ -1,5 +1,6 @@
 ﻿using CC.Application.Configrations;
 using CC.Domain.Entities;
+using CC.Infrastructure.EntityEnum;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Security.Claims;
@@ -14,12 +15,13 @@ namespace CC.Application.Helper
 
             string certificatePath = securitySettings.Value.CertificatePath;
             string certificatePassword = securitySettings.Value.CertificatePassword;
+            string roleName = Enum.GetName(typeof(Roles), user.Role);
 
 
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString() ),
-                    new Claim(ClaimTypes.Role, user.Role.ToString() ),
+                    new Claim(ClaimTypes.Role, roleName),
                 });
             string token = GetToken(claimsIdentity, certificatePath, certificatePassword);
 

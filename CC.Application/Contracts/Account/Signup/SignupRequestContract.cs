@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CC.Infrastructure.EntityEnum;
+using System.ComponentModel.DataAnnotations;
 
 namespace CC.Application.Contracts.Account;
 
@@ -26,4 +27,16 @@ public class SignupRequestContract
     [Required]
     [StringLength(100, MinimumLength = 6)]
     public string Password { get; set; }
+
+    /// <summary>
+    /// Role for the new account.
+    /// </summary>
+    /// <remarks>
+    /// Choose one of the following roles:
+    /// - 1: Admin
+    /// - 2: Manager
+    /// - 3: User
+    /// </remarks>
+    [Required]
+    public Roles Role { get; set; }
 }

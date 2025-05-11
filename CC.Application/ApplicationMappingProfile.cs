@@ -43,7 +43,7 @@ namespace CC.Application
                         .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
                         .ForMember(dest => dest.NormalizedUsername, opt => opt.MapFrom(src => src.Username.ToUpper()))
                         .ForMember(dest => dest.Password, opt => opt.MapFrom(src => new PasswordEncryption().EncryptPassword(src.Password)))
-                        .ForMember(dest => dest.Role, opt => opt.Ignore())
+                        .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
                         .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom((src, dest, member, context) => dest.Username))
                         .ForMember(dest => dest.CreatedOn, opt => opt.MapFrom((src, dest, member, context) => DateTime.UtcNow.Ticks))
                         .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())

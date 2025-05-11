@@ -1,10 +1,10 @@
 ﻿using AspNetCoreRateLimit;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CC.Application;
 using CC.Application.Configrations;
+using CC.Infrastructure;
 using CC.Infrastructure.DatabaseContext;
 using CC.Presentation;
 using CC.Presentation.Helper;
@@ -14,11 +14,8 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Configuration;
-using System.Reflection;
+using Serilog;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -67,8 +64,6 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 });
-
-
 #endregion
 
 #region App Settings configration
@@ -83,7 +78,7 @@ var configurationBuilder = new ConfigurationBuilder()
 IConfiguration configuration = configurationBuilder.Build();
 builder.Configuration.AddConfiguration(configuration);
 builder.Services.Configure<ExchangeProviderSettings>(configuration.GetSection("ExchangeProviderSettings"));
-builder.Services.Configure<SecuritySettings>(configuration.GetSection("SecuritySettings")); 
+builder.Services.Configure<SecuritySettings>(configuration.GetSection("SecuritySettings"));
 #endregion
 
 #region API throttling configration
@@ -141,16 +136,30 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     // Register modules from each layer
     containerBuilder.RegisterModule(new ApplicationModule());
-    containerBuilder.RegisterAssemblyModules(Assembly.Load("CC.Infrastructure"));
+    containerBuilder.RegisterModule(new InfrastructureModule());
     containerBuilder.RegisterModule(new PresentationModule());
     containerBuilder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
     containerBuilder.RegisterInstance(mapperConfig).As<AutoMapper.IConfigurationProvider>().SingleInstance();
 });
 
-IMapper mapper = mapperConfig.CreateMapper(); 
+IMapper mapper = mapperConfig.CreateMapper();
 #endregion
 
+#region Serilog Configuration
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration)
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.Seq(configuration.GetValue<string>("Serilog:WriteTo:1:Args:serverUrl"))
+        .WriteTo.File(
+            path: configuration.GetValue<string>("Serilog:WriteTo:2:Args:path"),
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 7)
+    .CreateLogger();
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+#endregion
 
 
 var app = builder.Build();
@@ -161,6 +170,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseIpRateLimiting();
 

@@ -8,10 +8,7 @@ using CC.Application.Decorators;
 using CC.Application.Interfaces;
 using CC.Application.Services.Account;
 using CC.Application.Services.Conversion;
-using CC.Domain.Interfaces;
-using CC.Infrastructure.Services.Conversion;
 using Microsoft.Extensions.Options;
-
 namespace CC.Presentation
 {
     /// <summary>
@@ -71,7 +68,6 @@ namespace CC.Presentation
             builder.RegisterType<AccountService>()
                 .As<IAccountService>()
                 .InstancePerLifetimeScope();
-
         }
     }
 }

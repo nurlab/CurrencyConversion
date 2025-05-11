@@ -1,4 +1,5 @@
 ﻿using CC.Application.Interfaces;
+using Serilog;
 
 namespace CC.Application.Contracts;
 
@@ -23,10 +24,9 @@ public class ResponseContract<T> : IResponseContract<T> where T : class, new()
     /// Initializes a new instance of the <see cref="ResponseContract{T}"/> class.
     /// </summary>
     /// <param name="exceptionHandler">The exception handler for processing exceptions.</param>
-    /// <exception cref="ArgumentNullException">Thrown when exceptionHandler is null.</exception>
     public ResponseContract(IExceptionHandler<T> exceptionHandler)
     {
-        _exceptionHandler = exceptionHandler ?? throw new ArgumentNullException(nameof(exceptionHandler));
+        _exceptionHandler = exceptionHandler; ;
         Messages = new List<string>();
         ErrorCode = string.Empty;
     }
@@ -117,6 +117,8 @@ public class ResponseContract<T> : IResponseContract<T> where T : class, new()
     /// <returns>The configured error response.</returns>
     public IResponseContract<T> ProcessErrorResponse(List<string> messages, string errorCode)
     {
+        foreach (var message in messages) if(!string.IsNullOrEmpty(message)) Log.Error($"{errorCode}-{message}");
+        
         Messages.AddRange(messages);
         Data = null;
         return new ResponseContract<T>(_exceptionHandler)

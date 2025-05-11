@@ -1,7 +1,10 @@
 ﻿using Autofac;
+using AutoMapper;
 using CC.Application.Contracts;
 using CC.Application.Decorators;
- using CC.Application.Interfaces;
+using CC.Application.Interfaces;
+using CC.Domain.Contracts;
+using CC.Domain.Interfaces;
 
 namespace CC.Application;
 
@@ -25,19 +28,33 @@ public class ApplicationModule : Module
     /// <param name="builder">The Autofac container builder.</param>
     protected override void Load(ContainerBuilder builder)
     {
-        if (builder == null)
-        {
-            throw new ArgumentNullException(nameof(builder));
-        }
 
-        // Register generic response contract implementation
         builder.RegisterGeneric(typeof(ResponseContract<>))
                .As(typeof(IResponseContract<>))
                .InstancePerLifetimeScope();
 
-        // Register validation services
+        builder.RegisterGeneric(typeof(ResultContract<>))
+               .As(typeof(IResultContract<>))
+               .InstancePerLifetimeScope();
+        
         builder.RegisterType<ConversionValidator>()
                .As<IConversionValidator>()
                .InstancePerLifetimeScope();
+
+        builder.RegisterType<AccountValidator>()
+               .As<IAccountValidator>()
+               .InstancePerLifetimeScope();
+
+        builder.Register(context => new MapperConfiguration(cfg =>
+        {
+            // Register your mappings here
+            cfg.AddProfile<ApplicationMappingProfile>(); // If you have a mapping profile
+        })).AsSelf().SingleInstance();
+
+        builder.Register(c => c.Resolve<MapperConfiguration>().CreateMapper(c.Resolve))
+        .As<IMapper>()
+        .InstancePerLifetimeScope();
+
+
     }
 }

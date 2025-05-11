@@ -1,6 +1,8 @@
 ﻿using CC.Application.Configrations;
 using CC.Application.Constants;
-using CC.Application.Contracts;
+using CC.Application.Contracts.Conversion.ConvertLatest;
+using CC.Application.Contracts.Conversion.GetLatestExRate;
+using CC.Application.Contracts.Conversion.GetRateHistory;
 using CC.Application.Interfaces;
 using Microsoft.Extensions.Options;
 using System.Text.RegularExpressions;
@@ -31,7 +33,7 @@ public class ConversionValidator : IConversionValidator
     /// <param name="responseContract">The response contract for returning validation results.</param>
     public ConversionValidator(IResponseContract<object> responseContract, IOptions<ExchangeProviderSettings> providerSettings)
     {
-        _responseContract = responseContract ?? throw new ArgumentNullException(nameof(responseContract));
+        _responseContract = responseContract;
         _providerSettings = providerSettings.Value;
     }
 
@@ -42,7 +44,7 @@ public class ConversionValidator : IConversionValidator
     /// <returns>
     /// A success response if validation passes, or an error response containing validation messages.
     /// </returns>
-    public IResponseContract<object> Validate(ConvertRequest request)
+    public IResponseContract<object> Validate(ConvertLatestRequestContract request)
     {
         try
         {
@@ -98,7 +100,7 @@ public class ConversionValidator : IConversionValidator
     /// <returns>
     /// A success response if validation passes, or an error response containing validation messages.
     /// </returns>
-    public IResponseContract<object> Validate(GetRateHistoryRequest request)
+    public IResponseContract<object> Validate(GetRateHistoryRequestContract request)
     {
         try
         {
@@ -138,7 +140,7 @@ public class ConversionValidator : IConversionValidator
     /// <returns>
     /// A success response if validation passes, or an error response if the request is null.
     /// </returns>
-    public IResponseContract<object> Validate(GetLatestExRateRequest request)
+    public IResponseContract<object> Validate(GetLatestExRateRequestContract request)
     {
         try
         {

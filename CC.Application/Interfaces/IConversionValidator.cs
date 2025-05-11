@@ -1,5 +1,7 @@
-﻿
-using CC.Application.Contracts;
+﻿using CC.Application.Contracts.Conversion;
+using CC.Application.Contracts.Conversion.ConvertLatest;
+using CC.Application.Contracts.Conversion.GetLatestExRate;
+using CC.Application.Contracts.Conversion.GetRateHistory;
 
 namespace CC.Application.Interfaces;
 
@@ -25,7 +27,7 @@ public interface IConversionValidator
     /// Response contract indicating validation success/failure,
     /// containing error messages if validation fails.
     /// </returns>
-    IResponseContract<object> Validate(ConvertRequest request);
+    IResponseContract<object> Validate(ConvertLatestRequestContract request);
 
     /// <summary>
     /// Validates a historical exchange rate request.
@@ -35,7 +37,7 @@ public interface IConversionValidator
     /// Response contract indicating validation success/failure,
     /// containing error messages if validation fails.
     /// </returns>
-    IResponseContract<object> Validate(GetRateHistoryRequest request);
+    IResponseContract<object> Validate(GetRateHistoryRequestContract request);
 
     /// <summary>
     /// Validates a latest exchange rate request.
@@ -45,5 +47,5 @@ public interface IConversionValidator
     /// Response contract indicating validation success/failure,
     /// containing error messages if validation fails.
     /// </returns>
-    IResponseContract<object> Validate(GetLatestExRateRequest request);
+    IResponseContract<object> Validate(GetLatestExRateRequestContract request);
 }

@@ -1,7 +1,8 @@
-﻿using CC.Application.Contracts;
-using CC.Application.DTOs;
-using CC.Application.Enums;
+﻿using CC.Application.Contracts.Conversion.ConvertLatest;
+using CC.Application.Contracts.Conversion.GetLatestExRate;
+using CC.Application.Contracts.Conversion.GetRateHistory;
 using CC.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CC.Presentation.Controllers;
@@ -20,29 +21,13 @@ namespace CC.Presentation.Controllers;
 /// </remarks>
 [ApiController]
 [Route("[controller]")]
-public class ConversionController : ControllerBase
+[Authorize]
+public class ConversionController(IResponseContract<ConvertLatestResponseContract> convertLatestResponse
+    , IResponseContract<GetRateHistoryResponseContract> getRateHistoryResponse
+    , IResponseContract<GetLatestExRateResponseContract> getLatestExRateResponse
+    , IConversionService conversionService
+    , IConversionValidator validator) : ControllerBase
 {
-    private readonly IConversionValidator _validator;
-    private readonly IExchangeServiceFactory _exchangeServiceFactory;
-    private readonly IResponseContract<ConvertLatestResponse> _convertLatestResponse;
-    private readonly IResponseContract<GetRateHistoryServiceResponseDto> _getRateHistoryResponse;
-    private readonly IResponseContract<GetLatestExRateResponse> _getLatestExRateResponse;
-    private readonly IExchangeService _exchangeService;
-
-    public ConversionController(
-        IConversionValidator validator,
-        IExchangeServiceFactory exchangeServiceFactory,
-        IResponseContract<ConvertLatestResponse> convertLatestResponse,
-        IResponseContract<GetRateHistoryServiceResponseDto> getRateHistoryResponse,
-        IResponseContract<GetLatestExRateResponse> getLatestExRateResponse)
-    {
-        _validator = validator;
-        _exchangeServiceFactory = exchangeServiceFactory;
-        _convertLatestResponse = convertLatestResponse;
-        _getRateHistoryResponse = getRateHistoryResponse;
-        _getLatestExRateResponse = getLatestExRateResponse;
-        _exchangeService = _exchangeServiceFactory.GetProvider(ExchangeProvider.Frankfurter);
-    }
 
     /// <summary>
     /// Gets the latest exchange rates for a specified base currency.
@@ -56,16 +41,21 @@ public class ConversionController : ControllerBase
     /// </list>
     /// </returns>
     [HttpPost("get-latest-exchange-rate", Name = "Get Latest Exchange Rate")]
-    [ProducesResponseType(typeof(GetLatestExRateResponse), StatusCodes.Status200OK)]
-    public async Task<IResponseContract<GetLatestExRateResponse>> GetLatestExchangeRate([FromBody] GetLatestExRateRequest request)
+    [ProducesResponseType(typeof(GetLatestExRateResponseContract), StatusCodes.Status200OK)]
+    public async Task<IResponseContract<GetLatestExRateResponseContract>> GetLatestExchangeRate([FromBody] GetLatestExRateRequestContract request)
     {
+        try
+        {
+            var validationResponse = validator.Validate(request);
+            if (!validationResponse.IsSuccess) return getLatestExRateResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
+            var res=  await conversionService.GetLatestExchangeRateAsync(request);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return getLatestExRateResponse.HandleException(ex);
+        }
 
-        var validationResult = _validator.Validate(request);
-        if (!validationResult.IsSuccess) return _getLatestExRateResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
-        var exchangeProviderResult = await _exchangeService.GetLatestExRateAsync(request);
-        if (!exchangeProviderResult.IsSuccess) return _getLatestExRateResponse.ProcessErrorResponse(exchangeProviderResult.Messages, exchangeProviderResult.ErrorCode);
-
-        return _getLatestExRateResponse.ProcessSuccessResponse(new GetLatestExRateResponse(exchangeProviderResult.Data));
     }
 
     /// <summary>
@@ -80,19 +70,13 @@ public class ConversionController : ControllerBase
     /// </list>
     /// </returns>
     [HttpPost("convert", Name = "Convert")]
-    [ProducesResponseType(typeof(ConvertLatestResponse), StatusCodes.Status200OK)]
-    public async Task<IResponseContract<ConvertLatestResponse>> Convert([FromBody] ConvertRequest request)
+    [ProducesResponseType(typeof(ConvertLatestResponseContract), StatusCodes.Status200OK)]
+    public async Task<IResponseContract<ConvertLatestResponseContract>> Convert([FromBody] ConvertLatestRequestContract request)
     {
-
-        if (request.FromCurrency == request.ToCurrency) return _convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponse(request.Amount, request.ToCurrency));
-
-        var validationResult = _validator.Validate(request);
-        if (!validationResult.IsSuccess) return _convertLatestResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
-
-        var exchangeProviderResult = await _exchangeService.ConvertAsync(request);
-        if (!exchangeProviderResult.IsSuccess) return _convertLatestResponse.ProcessErrorResponse(exchangeProviderResult.Messages, exchangeProviderResult.ErrorCode);
-
-        return _convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponse(exchangeProviderResult.Data));
+        if (request.FromCurrency == request.ToCurrency) return convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponseContract(request.Amount, request.ToCurrency));
+        var validationResult = validator.Validate(request);
+        if (!validationResult.IsSuccess) return convertLatestResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
+        return await conversionService.ConvertAsync(request);
     }
 
     /// <summary>
@@ -107,15 +91,11 @@ public class ConversionController : ControllerBase
     /// </list>
     /// </returns>
     [HttpPost("get-rate-history", Name = "Get Rate History")]
-    [ProducesResponseType(typeof(GetRateHistoryServiceResponseDto), StatusCodes.Status200OK)]
-    public async Task<IResponseContract<GetRateHistoryServiceResponseDto>> GetRateHistory([FromBody] GetRateHistoryRequest request)
+    [ProducesResponseType(typeof(GetRateHistoryResponseContract), StatusCodes.Status200OK)]
+    public async Task<IResponseContract<GetRateHistoryResponseContract>> GetRateHistory([FromBody] GetRateHistoryRequestContract request)
     {
-        var validationResult = _validator.Validate(request);
-        if (!validationResult.IsSuccess) return _getRateHistoryResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
-
-        var exchangeProviderResult = await _exchangeService.GetRateHistoryAsync(request);
-        if (!exchangeProviderResult.IsSuccess) return _getRateHistoryResponse.ProcessErrorResponse(exchangeProviderResult.Messages, exchangeProviderResult.ErrorCode);
-
-        return _getRateHistoryResponse.ProcessSuccessResponse(new GetRateHistoryServiceResponseDto(exchangeProviderResult.Data));
+        var validationResult = validator.Validate(request);
+        if (!validationResult.IsSuccess) return getRateHistoryResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
+        return await conversionService.GetRateHistoryAsync(request);
     }
 }

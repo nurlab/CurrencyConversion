@@ -3,8 +3,10 @@ using CC.Application.Contracts;
 using CC.Application.Decorators;
 using CC.Application.ExceptionHandlers;
 using CC.Application.Interfaces;
+using CC.Domain.Interfaces;
 using CC.Infrastructure.Factory;
-using CC.Infrastructure.Services;
+using CC.Infrastructure.Repositories.AccountRepository;
+using CC.Infrastructure.Services.Conversion;
 using Microsoft.Extensions.Http;
 using Polly;
 using Polly.Registry;
@@ -54,6 +56,10 @@ public class InfrastructureModule : Module
             return new HttpClient(handler);
         }).As<HttpClient>().InstancePerDependency();
 
+        builder.RegisterType<CC.Infrastructure.UnitOfWork.UnitOfWork>()
+           .As<IUnitOfWork>()
+           .InstancePerLifetimeScope();
+
         builder.RegisterGeneric(typeof(FrankfurterExceptionHandler<>))
              .As(typeof(IExceptionHandler<>))
              .InstancePerLifetimeScope();
@@ -68,8 +74,12 @@ public class InfrastructureModule : Module
         builder.RegisterType<ExchangeServiceFactory>()
             .As<IExchangeServiceFactory>()
             .InstancePerLifetimeScope();
-        builder.RegisterType<FrankfurterService>()
+        builder.RegisterType<FrankfurterProvider>()
             .As<IExchangeService>()
+            .InstancePerLifetimeScope();
+
+        builder.RegisterType<UserRepository>()
+            .As<IUserRepository>()
             .InstancePerLifetimeScope();
     }
     /// <summary>

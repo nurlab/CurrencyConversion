@@ -1,6 +1,7 @@
 ﻿using CC.Application.Enums;
 using CC.Application.Interfaces;
-using CC.Infrastructure.Services;
+using CC.Domain.Interfaces;
+using CC.Infrastructure.Services.Conversion;
 
 namespace CC.Infrastructure.Factory;
 
@@ -24,7 +25,7 @@ public class ExchangeServiceFactory : IExchangeServiceFactory
         {
             switch (service)
             {
-                case FrankfurterService:
+                case FrankfurterProvider:
                     _providers[ExchangeProvider.Frankfurter] = service;
                     break;
                     // case OpenExchangeRatesService:

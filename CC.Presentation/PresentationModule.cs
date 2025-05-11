@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using AspNetCoreRateLimit;
+using Autofac;
 using AutoMapper;
 using CC.Application.Configrations;
 using CC.Application.Contracts;
@@ -39,7 +40,13 @@ namespace CC.Presentation
             builder.RegisterType<AccountService>()
                    .As<IAccountService>()
                    .InstancePerLifetimeScope();
+            builder.RegisterType<MemoryCacheRateLimitCounterStore>()
+           .As<IRateLimitCounterStore>()
+           .SingleInstance();  // Singleton scope
 
+            builder.RegisterType<RateLimitConfiguration>()
+                   .As<IRateLimitConfiguration>()
+                   .SingleInstance();  // Singleton scope
 
 
             // Register individual dependencies

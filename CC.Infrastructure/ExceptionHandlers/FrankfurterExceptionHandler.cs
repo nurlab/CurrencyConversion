@@ -30,7 +30,8 @@ public class FrankfurterExceptionHandler<T> : IExceptionHandler<T> where T : cla
     {
         if (ex == null)
         {
-            throw new ArgumentNullException(nameof(ex));
+            return (new List<string> { "An unexpected error occurred while processing your request." },
+                 ErrorCodes.EXCHANGE_INTEGRATION_UNEXPECTED);
         }
 
         return ex switch

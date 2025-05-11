@@ -1,7 +1,6 @@
 ﻿using CC.Application.Contracts.Conversion.ConvertLatest;
 using CC.Application.Contracts.Conversion.GetLatestExRate;
 using CC.Application.Contracts.Conversion.GetRateHistory;
-using CC.Domain.DTOs;
 
 namespace CC.Application.Interfaces
 {

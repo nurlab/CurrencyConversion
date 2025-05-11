@@ -1,6 +1,4 @@
-﻿using CC.Domain.DTOs;
-
-namespace CC.Application.Contracts.Conversion.GetLatestExRate;
+﻿namespace CC.Application.Contracts.Conversion.GetLatestExRate;
 
 /// <summary>
 /// Represents the response containing the latest exchange rates for a base currency.
@@ -45,21 +43,7 @@ public class GetLatestExRateResponseContract
     /// <exception cref="ArgumentNullException">Thrown when currency parameter is null.</exception>
     public GetLatestExRateResponseContract(Dictionary<string, decimal> rates, string currency)
     {
-        Rates = rates ?? new Dictionary<string, decimal>();
-        Currency = currency ?? throw new ArgumentNullException(nameof(currency), "Currency cannot be null");
-    }
-
-    /// <summary>
-    /// Initializes a new instance from a service DTO object.
-    /// </summary>
-    /// <param name="data">The data transfer object containing exchange rate information.</param>
-    /// <exception cref="ArgumentNullException">Thrown when data parameter is null.</exception>
-    public GetLatestExRateResponseContract(GetLatestExRateServiceResponseDto data)
-    {
-        if (data == null)
-            throw new ArgumentNullException(nameof(data), "Service response data cannot be null");
-
-        Rates = data.Rates ?? new Dictionary<string, decimal>();
-        Currency = data.Currency;
+        Rates = rates;
+        Currency = currency;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CC.Application.Contracts;
 using CC.Application.Contracts.Conversion.ConvertLatest;
 using CC.Application.Contracts.Conversion.GetLatestExRate;
 using CC.Application.Contracts.Conversion.GetRateHistory;
@@ -24,17 +25,17 @@ namespace CC.Application.Services.Conversion
         public async Task<IResponseContract<GetLatestExRateResponseContract>> GetLatestExchangeRateAsync(GetLatestExRateRequestContract request)
         {
             IResultContract<GetLatestExRateResultDto> resultContract = await _exchangeService.GetLatestExRateAsync(_mapper.Map<GetLatestExRateRequestDto>(request));
-            return _mapper.Map<IResponseContract<GetLatestExRateResponseContract>>(resultContract);
+            return _mapper.Map<ResponseContract<GetLatestExRateResponseContract>>(resultContract);
         }
         public async Task<IResponseContract<ConvertLatestResponseContract>> ConvertAsync(ConvertLatestRequestContract request)
         {
             IResultContract<ConvertLatestResultDto> resultContract = await _exchangeService.ConvertAsync(_mapper.Map<ConvertRequestDto>(request));
-            return _mapper.Map<IResponseContract<ConvertLatestResponseContract>>(resultContract);
+            return _mapper.Map<ResponseContract<ConvertLatestResponseContract>>(resultContract);
         }
         public async Task<IResponseContract<GetRateHistoryResponseContract>> GetRateHistoryAsync(GetRateHistoryRequestContract request)
         {
             IResultContract<GetRateHistoryResultDto> resultContract = await _exchangeService.GetRateHistoryAsync(_mapper.Map<GetRateHistoryRequestDto>(request));
-            return _mapper.Map<IResponseContract<GetRateHistoryResponseContract>>(resultContract);
+            return _mapper.Map<ResponseContract<GetRateHistoryResponseContract>>(resultContract);
         }
     }
 }

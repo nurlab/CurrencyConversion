@@ -2,6 +2,8 @@
 using CC.Application.Contracts;
 using CC.Application.Decorators;
 using CC.Application.Interfaces;
+using CC.Application.Services.Conversion;
+using CC.Infrastructure.Services.Conversion;
 
 namespace CC.Presentation
 {
@@ -23,6 +25,11 @@ namespace CC.Presentation
             builder.RegisterType<ConversionValidator>()
                    .As<IConversionValidator>()
                    .InstancePerLifetimeScope();
+
+            builder.RegisterType<ConversionService>()
+                   .As<IConversionService>()
+                   .InstancePerLifetimeScope();
+
 
 
         }

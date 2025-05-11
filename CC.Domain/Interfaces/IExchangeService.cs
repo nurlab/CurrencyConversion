@@ -1,6 +1,5 @@
 ﻿using CC.Application.Interfaces;
 using CC.Domain.Contracts.Conversion;
-using CC.Domain.DTOs;
 
 namespace CC.Domain.Interfaces;
 

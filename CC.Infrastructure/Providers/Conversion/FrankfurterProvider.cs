@@ -1,11 +1,7 @@
 ﻿using CC.Application.Configrations;
 using CC.Application.Constants;
-using CC.Application.Contracts.Conversion.ConvertLatest;
-using CC.Application.Contracts.Conversion.GetLatestExRate;
-using CC.Application.Contracts.Conversion.GetRateHistory;
 using CC.Application.Interfaces;
 using CC.Domain.Contracts.Conversion;
-using CC.Domain.DTOs;
 using CC.Domain.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
@@ -91,7 +87,7 @@ public class FrankfurterProvider : IExchangeService
                 });
 
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var exchangeRate = JsonSerializer.Deserialize<ExchangeRateAPIResponse>(jsonString);
+                var exchangeRate = JsonSerializer.Deserialize<GetLatestExRateResultDto>(jsonString);
 
                 if (exchangeRate?.Rates == null)
                 {
@@ -132,7 +128,7 @@ public class FrankfurterProvider : IExchangeService
                 });
 
                 var jsonString = await response.Content.ReadAsStringAsync();
-                var exchangeRate = JsonSerializer.Deserialize<ExchangeRateAPIResponse>(jsonString);
+                var exchangeRate = JsonSerializer.Deserialize<ConvertLatestResultDto>(jsonString);
 
                 if (exchangeRate?.Rates == null || !exchangeRate.Rates.TryGetValue(request.ToCurrency, out rate))
                 {

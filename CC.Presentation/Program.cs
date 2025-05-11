@@ -3,6 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CC.Application;
 using CC.Application.Configrations;
+using CC.Infrastructure.DatabaseContext;
 using CC.Presentation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddMemoryCache();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 
-//services.AddDbContext<AppDbContext>(options =>
-//    options.UseSqlite($"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "AppDb.db")}"));
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlite($"Data Source={Path.Combine(Directory.GetCurrentDirectory(), "AppDb.db")}"));
 
 var cert = new X509Certificate2(
     builder.Configuration["SecuritySettings:CertificatePath"],

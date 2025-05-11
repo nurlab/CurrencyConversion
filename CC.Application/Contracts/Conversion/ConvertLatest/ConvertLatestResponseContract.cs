@@ -1,6 +1,4 @@
-﻿using CC.Domain.DTOs;
-
-namespace CC.Application.Contracts.Conversion.ConvertLatest;
+﻿namespace CC.Application.Contracts.Conversion.ConvertLatest;
 
 /// <summary>
 /// Represents the successful response from a currency conversion operation.
@@ -43,15 +41,5 @@ public class ConvertLatestResponseContract
     {
         Amount = amount;
         Currency = currency;
-    }
-
-    /// <summary>
-    /// Initializes a new instance from a DTO object.
-    /// </summary>
-    /// <param name="data">The data transfer object containing conversion results.</param>
-    public ConvertLatestResponseContract(ConvertServiceResponseDto data)
-    {
-        Amount = data.Amount;
-        Currency = data.Currency;
     }
 }

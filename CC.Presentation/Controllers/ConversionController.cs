@@ -42,9 +42,18 @@ public class ConversionController(IResponseContract<ConvertLatestResponseContrac
     [ProducesResponseType(typeof(GetLatestExRateResponseContract), StatusCodes.Status200OK)]
     public async Task<IResponseContract<GetLatestExRateResponseContract>> GetLatestExchangeRate([FromBody] GetLatestExRateRequestContract request)
     {
-        var validationResponse = validator.Validate(request);
-        if (!validationResponse.IsSuccess) return getLatestExRateResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
-        return await conversionService.GetLatestExchangeRateAsync(request);
+        try
+        {
+            var validationResponse = validator.Validate(request);
+            if (!validationResponse.IsSuccess) return getLatestExRateResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
+            var res=  await conversionService.GetLatestExchangeRateAsync(request);
+            return res;
+        }
+        catch (Exception ex)
+        {
+            return getLatestExRateResponse.HandleException(ex);
+        }
+
     }
 
     /// <summary>

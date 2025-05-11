@@ -31,6 +31,12 @@ public class ResultContract<T> : IResultContract<T> where T : class, new()
         ErrorCode = string.Empty;
     }
 
+
+    public ResultContract()
+    {
+
+    }
+
     /// <summary>
     /// The response data payload.
     /// </summary>

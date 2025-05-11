@@ -1,6 +1,5 @@
 ﻿using AspNetCoreRateLimit;
 using Autofac;
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CC.Application;
@@ -13,13 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Polly;
 using Serilog;
-using System.Configuration;
-using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,22 +25,22 @@ builder.Services.AddEndpointsApiExplorer();
 #region Swagger Configration
 builder.Services.AddSwaggerGen(c =>
 {
-c.SwaggerDoc("v1", new OpenApiInfo { Title = "Conversion API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Conversion API", Version = "v1" });
 
-var jwtSecurityScheme = new OpenApiSecurityScheme
-{
-    Scheme = "bearer",
-    BearerFormat = "JWT",
-    Name = "Authorization",
-    In = ParameterLocation.Header,
-    Type = SecuritySchemeType.Http,
-    Description = "Put **_only_** your JWT Bearer token below.",
-
-    Reference = new OpenApiReference
+    var jwtSecurityScheme = new OpenApiSecurityScheme
     {
-        Id = "Bearer",
-        Type = ReferenceType.SecurityScheme
-    }
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Description = "Put **_only_** your JWT Bearer token below.",
+
+        Reference = new OpenApiReference
+        {
+            Id = "Bearer",
+            Type = ReferenceType.SecurityScheme
+        }
     };
 
     c.AddSecurityDefinition("Bearer", jwtSecurityScheme);
@@ -58,7 +52,7 @@ var jwtSecurityScheme = new OpenApiSecurityScheme
                 Array.Empty<string>()
             }
     });
-}); 
+});
 #endregion
 
 #region App Settings configration
@@ -73,7 +67,7 @@ var configurationBuilder = new ConfigurationBuilder()
 IConfiguration configuration = configurationBuilder.Build();
 builder.Configuration.AddConfiguration(configuration);
 builder.Services.Configure<ExchangeProviderSettings>(configuration.GetSection("ExchangeProviderSettings"));
-builder.Services.Configure<SecuritySettings>(configuration.GetSection("SecuritySettings")); 
+builder.Services.Configure<SecuritySettings>(configuration.GetSection("SecuritySettings"));
 #endregion
 
 #region API throttling configration
@@ -143,7 +137,7 @@ IMapper mapper = mapperConfig.CreateMapper();
 #region Serilog Configuration
 
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(configuration) 
+    .ReadFrom.Configuration(configuration)
         .Enrich.FromLogContext()
         .WriteTo.Console()
         .WriteTo.Seq(configuration.GetValue<string>("Serilog:WriteTo:1:Args:serverUrl"))
@@ -165,6 +159,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseIpRateLimiting();
 

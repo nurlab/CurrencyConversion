@@ -1,4 +1,6 @@
-﻿using Polly;
+﻿using CC.Application.Constants;
+using Polly;
+using Serilog;
 
 namespace CC.Infrastructure.Policies;
 
@@ -63,11 +65,9 @@ public static class PolicyConfig
             ? $"Exception: {outcome.Exception.Message}"
             : $"Status code: {(int)outcome.Result.StatusCode} {outcome.Result.StatusCode}";
 
-        // In a real implementation, use dependency-injected ILogger
-        Console.WriteLine($"[Retry Policy] Attempt {retryCount}: Retrying after {delay.TotalSeconds:F1}s. Reason: {message}");
+        Log.Error($"[Retry Policy] Attempt {retryCount}: Retrying after {delay.TotalSeconds:F1}s. Reason: {message}");
 
-        // Alternatively, when integrated with proper logging:
-        // _logger.LogWarning("Retry attempt {RetryCount} after {DelaySeconds}s. Reason: {Reason}",
-        //     retryCount, delay.TotalSeconds, message);
+        Log.Warning($"Retry attempt {retryCount} after {delay.TotalSeconds}s. Reason: {message}");
+
     }
 }

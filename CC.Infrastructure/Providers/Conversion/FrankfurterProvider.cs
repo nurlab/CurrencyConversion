@@ -173,8 +173,7 @@ public class FrankfurterProvider : IExchangeService
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        throw new HttpRequestException($"Request failed with status code {response.StatusCode}",
-                            null, response.StatusCode);
+                        cachedData = null;
                     }
 
                     return response;

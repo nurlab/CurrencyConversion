@@ -25,10 +25,9 @@ public class ResiliencePolicyProvider : IResiliencePolicyProvider
     /// Initializes a new instance of the <see cref="ResiliencePolicyProvider"/> class.
     /// </summary>
     /// <param name="policyRegistry">The Polly policy registry containing pre-configured policies.</param>
-    /// <exception cref="ArgumentNullException">Thrown when <paramref name="policyRegistry"/> is null.</exception>
     public ResiliencePolicyProvider(IReadOnlyPolicyRegistry<string> policyRegistry)
     {
-        _policyRegistry = policyRegistry ?? throw new ArgumentNullException(nameof(policyRegistry));
+        _policyRegistry = policyRegistry;
     }
 
     /// <inheritdoc/>

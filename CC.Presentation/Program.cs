@@ -5,6 +5,7 @@ using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CC.Application;
 using CC.Application.Configrations;
+using CC.Infrastructure;
 using CC.Infrastructure.DatabaseContext;
 using CC.Presentation;
 using CC.Presentation.Middlewares;
@@ -12,6 +13,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Polly;
+using Serilog;
 using System.Configuration;
 using System.Reflection;
 using System.Security.Cryptography.X509Certificates;
@@ -128,16 +131,30 @@ builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
 {
     // Register modules from each layer
     containerBuilder.RegisterModule(new ApplicationModule());
-    containerBuilder.RegisterAssemblyModules(Assembly.Load("CC.Infrastructure"));
+    containerBuilder.RegisterModule(new InfrastructureModule());
     containerBuilder.RegisterModule(new PresentationModule());
     containerBuilder.RegisterInstance(mapperConfig.CreateMapper()).As<IMapper>().SingleInstance();
     containerBuilder.RegisterInstance(mapperConfig).As<AutoMapper.IConfigurationProvider>().SingleInstance();
 });
 
-IMapper mapper = mapperConfig.CreateMapper(); 
+IMapper mapper = mapperConfig.CreateMapper();
 #endregion
 
+#region Serilog Configuration
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(configuration) 
+        .Enrich.FromLogContext()
+        .WriteTo.Console()
+        .WriteTo.Seq(configuration.GetValue<string>("Serilog:WriteTo:1:Args:serverUrl"))
+        .WriteTo.File(
+            path: configuration.GetValue<string>("Serilog:WriteTo:2:Args:path"),
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: 7)
+    .CreateLogger();
+builder.Host.UseSerilog((context, services, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+#endregion
 
 
 var app = builder.Build();

@@ -28,9 +28,6 @@ public class ExchangeServiceFactory : IExchangeServiceFactory
                 case FrankfurterProvider:
                     _providers[ExchangeProvider.Frankfurter] = service;
                     break;
-                    // case OpenExchangeRatesService:
-                    //     _providers[ExchangeProvider.OpenExchangeRates] = service;
-                    //     break;
             }
         }
     }
@@ -40,7 +37,6 @@ public class ExchangeServiceFactory : IExchangeServiceFactory
     /// </summary>
     /// <param name="provider">The exchange provider to retrieve the service for.</param>
     /// <returns>The corresponding <see cref="IExchangeService"/> implementation.</returns>
-    /// <exception cref="ArgumentException">Thrown when the specified provider is not supported.</exception>
     public IExchangeService GetProvider(ExchangeProvider provider)
     {
         if (_providers.TryGetValue(provider, out var service))

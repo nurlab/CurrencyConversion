@@ -1,9 +1,15 @@
 ﻿using Autofac;
+using AutoMapper;
+using CC.Application.Configrations;
 using CC.Application.Contracts;
+using CC.Application.Contracts.Account;
 using CC.Application.Decorators;
 using CC.Application.Interfaces;
+using CC.Application.Services.Account;
 using CC.Application.Services.Conversion;
+using CC.Domain.Interfaces;
 using CC.Infrastructure.Services.Conversion;
+using Microsoft.Extensions.Options;
 
 namespace CC.Presentation
 {
@@ -30,7 +36,34 @@ namespace CC.Presentation
                    .As<IConversionService>()
                    .InstancePerLifetimeScope();
 
+            builder.RegisterType<AccountService>()
+                   .As<IAccountService>()
+                   .InstancePerLifetimeScope();
 
+
+
+            // Register individual dependencies
+            builder.Register(context =>
+                context.Resolve<IOptions<SecuritySettings>>().Value)
+                .As<SecuritySettings>();
+
+            builder.RegisterType<Mapper>() // Assuming you use AutoMapper
+                .As<IMapper>()
+                .SingleInstance();
+
+
+            builder.RegisterType<ResponseContract<SigninResponseContract>>()
+                .As<IResponseContract<SigninResponseContract>>()
+                .InstancePerDependency();
+
+            builder.RegisterType<ResponseContract<SignupResponseContract>>()
+                .As<IResponseContract<SignupResponseContract>>()
+                .InstancePerDependency();
+
+            // Register AccountService
+            builder.RegisterType<AccountService>()
+                .As<IAccountService>()
+                .InstancePerLifetimeScope();
 
         }
     }

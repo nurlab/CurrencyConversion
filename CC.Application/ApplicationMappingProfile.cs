@@ -4,6 +4,7 @@ using CC.Application.Contracts.Account;
 using CC.Application.Contracts.Conversion.ConvertLatest;
 using CC.Application.Contracts.Conversion.GetLatestExRate;
 using CC.Application.Contracts.Conversion.GetRateHistory;
+using CC.Application.Helper;
 using CC.Application.Interfaces;
 using CC.Domain.Contracts;
 using CC.Domain.Contracts.Conversion;
@@ -38,7 +39,22 @@ namespace CC.Application
             #endregion
 
             #region Account
-            CreateMap<SignupRequestContract, User>();
+            CreateMap<SignupRequestContract, User>()
+                        .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+                        .ForMember(dest => dest.NormalizedUsername, opt => opt.MapFrom(src => src.Username.ToUpper()))
+                        .ForMember(dest => dest.Password, opt => opt.MapFrom(src => new PasswordEncryption().EncryptPassword(src.Password)))
+                        .ForMember(dest => dest.Role, opt => opt.Ignore())
+                        .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom((src, dest, member, context) => dest.Username))
+                        .ForMember(dest => dest.CreatedOn, opt => opt.MapFrom((src, dest, member, context) => DateTime.UtcNow.Ticks))
+                        .ForMember(dest => dest.UpdatedBy, opt => opt.Ignore())
+                        .ForMember(dest => dest.UpdatedOn, opt => opt.Ignore())
+                        .ForMember(dest => dest.IsDeleted, opt => opt.MapFrom((src, dest, member, context) => false))
+                        .ForMember(dest => dest.IsActive, opt => opt.MapFrom((src, dest, member, context) => true));
+
+
+            CreateMap<User, SignupResponseContract>()
+                .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username));
+
             CreateMap<User, SigninResponseContract>().ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role.ToString()));
             #endregion
 

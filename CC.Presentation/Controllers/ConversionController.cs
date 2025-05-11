@@ -2,6 +2,7 @@
 using CC.Application.Contracts.Conversion.GetLatestExRate;
 using CC.Application.Contracts.Conversion.GetRateHistory;
 using CC.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CC.Presentation.Controllers;
@@ -20,6 +21,7 @@ namespace CC.Presentation.Controllers;
 /// </remarks>
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class ConversionController(IResponseContract<ConvertLatestResponseContract> convertLatestResponse
     , IResponseContract<GetRateHistoryResponseContract> getRateHistoryResponse
     , IResponseContract<GetLatestExRateResponseContract> getLatestExRateResponse

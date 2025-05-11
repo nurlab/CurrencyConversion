@@ -16,7 +16,6 @@ namespace CC.Application.Helper
         public static string GenerateToken(X509Certificate2 cert, ClaimsIdentity claims, DateTime expDate)
         {
             var securityKey = new X509SecurityKey(cert);
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("12345"));
             var signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.RsaSha256);
 
             var token = new JwtSecurityToken(

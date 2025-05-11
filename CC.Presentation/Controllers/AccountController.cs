@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JoPulse.Controllers
 {
+    [ApiController]
+    [Route("[controller]")]
     [AllowAnonymous]
     public class AccountController(IResponseContract<SignupResponseContract> signupResponse
         , IAccountService accountService
@@ -12,7 +14,7 @@ namespace JoPulse.Controllers
         , IAccountValidator validator) : ControllerBase
     {
 
-        [HttpPost]
+        [HttpPost("sign-in", Name = "Signin")]
         public async Task<IResponseContract<SigninResponseContract>> Signin([FromBody] SigninRequestContract request)
         {
             var validationResponse = await validator.ValidateAsync(request);
@@ -20,12 +22,13 @@ namespace JoPulse.Controllers
             return await accountService.Signin(request);
         }
 
-        [HttpPost]
+        [HttpPost("sign-up", Name = "Sign Up")]
         public async Task<IResponseContract<SignupResponseContract>> Signup([FromBody] SignupRequestContract request)
         {
             var validationResponse = await validator.ValidateAsync(request);
             if (!validationResponse.IsSuccess) return signupResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
-            return await accountService.Signup(request);
+            var res =  await accountService.Signup(request);
+            return res;
         }
     }
 }

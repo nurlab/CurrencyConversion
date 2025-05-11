@@ -6,18 +6,16 @@ using CC.Application.Helper;
 using CC.Application.Interfaces;
 using CC.Domain.Entities;
 using CC.Domain.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace CC.Application.Services.Account;
 
-public class AccountService(IMapper _mpr
-    , IResponseContract<SigninResponseContract> signinResponse
+public class AccountService(IResponseContract<SigninResponseContract> signinResponse
     , IResponseContract<SignupResponseContract> signupResponse
     , IOptions<SecuritySettings> securitySettings
-    , IConfiguration configuration
     , IUserRepository userRepository
     , IMapper mapper
+    , IUnitOfWork uow
     ) : IAccountService
 {
 
@@ -56,18 +54,22 @@ public class AccountService(IMapper _mpr
             var user = mapper.Map<User>(request);
             user = await userRepository.AddAsync(user);
 
-            if (user == null)
+            int save = await uow.CommitAsync();
+            if (save == 0)
             {
                 return signupResponse.ProcessErrorResponse(
                     [$"Signup failure"],
                     ErrorCodes.SECURITY_SIGNUP_FAILED);
             }
-
             return signupResponse.ProcessSuccessResponse(mapper.Map<SignupResponseContract>(user));
         }
         catch (Exception ex)
         {
             return signupResponse.HandleException(ex);
+        }
+        finally
+        {
+            await uow.DisposeAsync();
         }
     }
 

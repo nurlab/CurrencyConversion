@@ -7,8 +7,10 @@ using CC.Application;
 using CC.Application.Configrations;
 using CC.Infrastructure.DatabaseContext;
 using CC.Presentation;
+using CC.Presentation.Helper;
 using CC.Presentation.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -21,41 +23,52 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add(new AuthorizeFilter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 #region Swagger Configration
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddSwaggerGen(options =>
 {
-c.SwaggerDoc("v1", new OpenApiInfo { Title = "Conversion API", Version = "v1" });
-
-var jwtSecurityScheme = new OpenApiSecurityScheme
-{
-    Scheme = "bearer",
-    BearerFormat = "JWT",
-    Name = "Authorization",
-    In = ParameterLocation.Header,
-    Type = SecuritySchemeType.Http,
-    Description = "Put **_only_** your JWT Bearer token below.",
-
-    Reference = new OpenApiReference
+    options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Id = "Bearer",
-        Type = ReferenceType.SecurityScheme
-    }
+        Title = "Currency Conversion App",
+        Version = "v1",
+        Description = "Currency Conversion"
+    });
+
+    options.UseInlineDefinitionsForEnums(); // optional
+    options.SchemaFilter<EnumSchemaFilter>();
+    var jwtSecurityScheme = new OpenApiSecurityScheme
+    {
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Description = "Put **_only_** your JWT Bearer token below.",
+
+        Reference = new OpenApiReference
+        {
+            Id = "Bearer",
+            Type = ReferenceType.SecurityScheme
+        }
     };
 
-    c.AddSecurityDefinition("Bearer", jwtSecurityScheme);
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    options.AddSecurityDefinition("Bearer", jwtSecurityScheme);
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
-            {
-                jwtSecurityScheme,
-                Array.Empty<string>()
-            }
+        {
+            jwtSecurityScheme,
+            Array.Empty<string>()
+        }
     });
-}); 
+});
+
+
 #endregion
 
 #region App Settings configration
@@ -154,6 +167,8 @@ app.UseIpRateLimiting();
 app.UseMiddleware<ThrottlingMiddleware>();
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -77,4 +77,8 @@ public static class ErrorCodes
     /// <summary>User signup failed due to invalid or duplicate credentials</summary>
     public const string SECURITY_SIGNUP_FAILED = "SECURITY_SIGNUP_FAILED";
     #endregion
+    #region Test
+    /// <summary>HTTP communication failure with exchange service</summary>
+    public const string VALIDATION_ERROR = "VALIDATION_ERROR";
+    #endregion
 }

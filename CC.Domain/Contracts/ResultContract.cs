@@ -1,4 +1,5 @@
 ﻿using CC.Application.Interfaces;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CC.Domain.Contracts;
 
@@ -26,15 +27,20 @@ public class ResultContract<T> : IResultContract<T> where T : class, new()
     /// <exception cref="ArgumentNullException">Thrown when exceptionHandler is null.</exception>
     public ResultContract(IExceptionHandler<T> exceptionHandler)
     {
-        _exceptionHandler = exceptionHandler ?? throw new ArgumentNullException(nameof(exceptionHandler));
+        _exceptionHandler = exceptionHandler;
         Messages = new List<string>();
         ErrorCode = string.Empty;
+        IsSuccess = false;
+        Data = null;
     }
 
 
     public ResultContract()
     {
-
+        Data = null;
+        Messages = new List<string>();
+        ErrorCode = string.Empty;
+        IsSuccess = false;
     }
 
     /// <summary>

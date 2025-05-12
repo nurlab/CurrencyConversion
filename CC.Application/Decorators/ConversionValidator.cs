@@ -48,7 +48,7 @@ public class ConversionValidator : IConversionValidator
     {
         try
         {
-            if (request == null)
+            if (string.IsNullOrEmpty(request.ToCurrency) || string.IsNullOrEmpty(request.FromCurrency) || request.Amount == 0)
                 return _responseContract.ProcessErrorResponse(
                     ["Request cannot be null."],
                     ErrorCodes.INVALID_REQUEST);

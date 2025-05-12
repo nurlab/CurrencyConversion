@@ -73,8 +73,9 @@ public class ConversionController(IResponseContract<ConvertLatestResponseContrac
     [ProducesResponseType(typeof(ConvertLatestResponseContract), StatusCodes.Status200OK)]
     public async Task<IResponseContract<ConvertLatestResponseContract>> Convert([FromBody] ConvertLatestRequestContract request)
     {
-        if (request.FromCurrency == request.ToCurrency) return convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponseContract(request.Amount, request.ToCurrency));
         var validationResult = validator.Validate(request);
+        if (request.FromCurrency == request.ToCurrency) return convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponseContract(request.Amount, request.ToCurrency));
+
         if (!validationResult.IsSuccess) return convertLatestResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
         return await conversionService.ConvertAsync(request);
     }

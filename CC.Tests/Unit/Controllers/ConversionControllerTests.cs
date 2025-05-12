@@ -39,6 +39,7 @@ namespace CC.Presentation.Tests.Controllers
         #region Convert Tests
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task Convert_WhenCurrenciesSame_ReturnsSameAmount()
         {
             // Arrange
@@ -68,6 +69,7 @@ namespace CC.Presentation.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task Convert_WhenValidationFails_ReturnsErrorResponse()
         {
             // Arrange
@@ -106,6 +108,7 @@ namespace CC.Presentation.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task Convert_WhenServiceReturnsSuccess_ReturnsConvertedAmount()
         {
             // Arrange
@@ -146,6 +149,7 @@ namespace CC.Presentation.Tests.Controllers
         #region GetLatestExchangeRate Tests
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task GetLatestExchangeRate_WhenValidationFails_ReturnsErrorResponse()
         {
             // Arrange
@@ -179,6 +183,7 @@ namespace CC.Presentation.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task GetLatestExchangeRate_WhenServiceThrowsException_ReturnsErrorResponse()
         {
             // Arrange
@@ -215,6 +220,7 @@ namespace CC.Presentation.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task GetLatestExchangeRate_WhenSuccessful_ReturnsRates()
         {
             // Arrange
@@ -249,6 +255,7 @@ namespace CC.Presentation.Tests.Controllers
         #region GetRateHistory Tests
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task GetRateHistory_WhenValidationFails_ReturnsErrorResponse()
         {
             // Arrange
@@ -287,6 +294,7 @@ namespace CC.Presentation.Tests.Controllers
         }
 
         [Fact]
+        [Trait("Coverage", "Critical")]
         public async Task GetRateHistory_WhenServiceReturnsSuccess_ReturnsHistoricalData()
         {
             // Arrange

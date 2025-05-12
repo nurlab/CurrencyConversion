@@ -1,0 +1,6 @@
+﻿<CoverletRunSettings>
+  <Format>cobertura,json</Format>
+  <Threshold>90</Threshold>
+  <ThresholdType>line,branch,method</ThresholdType>
+  <ExcludeByFile>**/Migrations/*.cs,**/DTOs/*.cs</ExcludeByFile>
+</CoverletRunSettings>

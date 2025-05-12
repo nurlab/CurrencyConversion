@@ -20,14 +20,29 @@ namespace CC.Presentation.Controllers;
 /// All endpoints return standardized response contracts with consistent error handling.
 /// </remarks>
 [ApiController]
-[Route("[controller]")]
+[Route("api/v{version:apiVersion}/[controller]")] // Added API versioning to the route
 [Authorize]
-public class ConversionController(IResponseContract<ConvertLatestResponseContract> convertLatestResponse
-    , IResponseContract<GetRateHistoryResponseContract> getRateHistoryResponse
-    , IResponseContract<GetLatestExRateResponseContract> getLatestExRateResponse
-    , IConversionService conversionService
-    , IConversionValidator validator) : ControllerBase
+public class ConversionController : ControllerBase
 {
+    private readonly IResponseContract<ConvertLatestResponseContract> convertLatestResponse;
+    private readonly IResponseContract<GetRateHistoryResponseContract> getRateHistoryResponse;
+    private readonly IResponseContract<GetLatestExRateResponseContract> getLatestExRateResponse;
+    private readonly IConversionService conversionService;
+    private readonly IConversionValidator validator;
+
+    public ConversionController(
+        IResponseContract<ConvertLatestResponseContract> convertLatestResponse,
+        IResponseContract<GetRateHistoryResponseContract> getRateHistoryResponse,
+        IResponseContract<GetLatestExRateResponseContract> getLatestExRateResponse,
+        IConversionService conversionService,
+        IConversionValidator validator)
+    {
+        this.convertLatestResponse = convertLatestResponse;
+        this.getRateHistoryResponse = getRateHistoryResponse;
+        this.getLatestExRateResponse = getLatestExRateResponse;
+        this.conversionService = conversionService;
+        this.validator = validator;
+    }
 
     /// <summary>
     /// Gets the latest exchange rates for a specified base currency.
@@ -49,14 +64,13 @@ public class ConversionController(IResponseContract<ConvertLatestResponseContrac
         {
             var validationResponse = validator.Validate(request);
             if (!validationResponse.IsSuccess) return getLatestExRateResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
-            var res=  await conversionService.GetLatestExchangeRateAsync(request);
+            var res = await conversionService.GetLatestExchangeRateAsync(request);
             return res;
         }
         catch (Exception ex)
         {
             return getLatestExRateResponse.HandleException(ex);
         }
-
     }
 
     /// <summary>

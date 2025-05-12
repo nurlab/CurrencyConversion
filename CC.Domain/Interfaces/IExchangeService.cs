@@ -19,7 +19,6 @@ namespace CC.Domain.Interfaces;
 /// </remarks>
 public interface IExchangeService
 {
-
     /// <summary>
     /// Retrieves the latest exchange rates for a specified base currency.
     /// </summary>

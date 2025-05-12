@@ -1,4 +1,5 @@
 ﻿namespace CC.Domain.Contracts.Account.Signup;
+
 /// <summary>
 /// Data transfer object for user registration response.
 /// Contains the returned information after a successful user registration.
@@ -19,5 +20,4 @@ public class SignupResultDto
     /// This value must be unique across all registered users.
     /// </remarks>
     public string Username { get; set; }
-
 }

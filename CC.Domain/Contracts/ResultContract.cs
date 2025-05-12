@@ -21,7 +21,7 @@ public class ResultContract<T> : IResultContract<T> where T : class, new()
     private readonly IExceptionHandler<T> _exceptionHandler;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ResponseContract{T}"/> class.
+    /// Initializes a new instance of the <see cref="ResultContract{T}"/> class.
     /// </summary>
     /// <param name="exceptionHandler">The exception handler for processing exceptions.</param>
     /// <exception cref="ArgumentNullException">Thrown when exceptionHandler is null.</exception>
@@ -34,7 +34,9 @@ public class ResultContract<T> : IResultContract<T> where T : class, new()
         Data = null;
     }
 
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ResultContract{T}"/> class with default values.
+    /// </summary>
     public ResultContract()
     {
         Data = null;

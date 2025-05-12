@@ -2,7 +2,6 @@
 
 namespace CC.Domain.Contracts.Conversion;
 
-
 /// <summary>
 /// Represents the result of a currency conversion operation, including the converted amount and target currency.
 /// </summary>
@@ -27,7 +26,7 @@ public class ConvertLatestResultDto
     public ConvertLatestResultDto(decimal amount, string currency)
     {
         Amount = decimal.Round(amount, 4, MidpointRounding.AwayFromZero);
-        Currency = currency; ;
+        Currency = currency;
     }
 
     public ConvertLatestResultDto() { }
@@ -73,5 +72,4 @@ public class ConvertLatestResultDto
     /// </value>
     [JsonPropertyName("rates")]
     public Dictionary<string, decimal> Rates { get; set; } = new();
-
 }

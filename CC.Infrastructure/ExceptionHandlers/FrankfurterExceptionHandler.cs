@@ -5,24 +5,20 @@ using System.Text.Json;
 namespace CC.Application.ExceptionHandlers;
 
 /// <summary>
-/// Exception handler specifically for Frankfurter API integration scenarios.
+/// Exception handler for managing Frankfurter API integration errors.
 /// </summary>
 /// <typeparam name="T">The response type, constrained to reference types with parameterless constructors.</typeparam>
-/// <remarks>
-/// This handler provides specialized exception handling for common Frankfurter API failure modes,
-/// mapping them to standardized error codes and user-friendly messages.
-/// </remarks>
 public class FrankfurterExceptionHandler<T> : IExceptionHandler<T> where T : class, new()
 {
     /// <summary>
-    /// Handles exceptions and converts them to standardized error messages and codes.
+    /// Handles exceptions and returns user-friendly error messages along with standardized error codes.
     /// </summary>
     /// <param name="ex">The exception to handle.</param>
     /// <returns>
     /// A tuple containing:
     /// <list type="number">
-    ///   <item><description>User-friendly error messages</description></item>
-    ///   <item><description>Standardized error code from <see cref="ErrorCodes"/></description></item>
+    ///   <item><description>A list of user-friendly error messages</description></item>
+    ///   <item><description>A standardized error code from <see cref="ErrorCodes"/></description></item>
     /// </list>
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="ex"/> is null.</exception>
@@ -31,7 +27,7 @@ public class FrankfurterExceptionHandler<T> : IExceptionHandler<T> where T : cla
         if (ex == null)
         {
             return (new List<string> { "An unexpected error occurred while processing your request." },
-                 ErrorCodes.EXCHANGE_INTEGRATION_UNEXPECTED);
+                    ErrorCodes.EXCHANGE_INTEGRATION_UNEXPECTED);
         }
 
         return ex switch

@@ -10,23 +10,10 @@ using Polly.Registry;
 using System.Text.Json;
 
 namespace CC.Infrastructure.Services.Conversion;
+
 /// <summary>
-/// Service implementation for interacting with the Frankfurter exchange rate API.
+/// Service for interacting with the Frankfurter exchange rate API.
 /// </summary>
-/// <remarks>
-/// This service provides:
-/// <list type="bullet">
-///   <item><description>Currency conversion between supported currencies</description></item>
-///   <item><description>Latest exchange rate lookups</description></item>
-///   <item><description>Historical exchange rate data</description></item>
-/// </list>
-/// Features include:
-/// <list type="bullet">
-///   <item><description>Automatic retry with exponential backoff</description></item>
-///   <item><description>In-memory caching of API responses</description></item>
-///   <item><description>Standardized error handling</description></item>
-/// </list>
-/// </remarks>
 public class FrankfurterProvider : IExchangeService
 {
     private readonly HttpClient _httpClient;
@@ -37,15 +24,6 @@ public class FrankfurterProvider : IExchangeService
     private readonly IResultContract<GetLatestExRateResultDto> _latestExRateServiceResult;
     private readonly ExchangeProviderSettings _providerSettings;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="FrankfurterProvider"/> class.
-    /// </summary>
-    /// <param name="httpClient">Configured HttpClient for API requests</param>
-    /// <param name="policyRegistry">Policy registry containing resilience policies</param>
-    /// <param name="memoryCache">Cache provider for response caching</param>
-    /// <param name="convertLatestResult">Response contract for conversion operations</param>
-    /// <param name="rateHistoryResult">Response contract for history operations</param>
-    /// <param name="latestExRateServiceResult">Response contract for rate lookup operations</param>
     public FrankfurterProvider(
         HttpClient httpClient,
         IReadOnlyPolicyRegistry<string> policyRegistry,
@@ -69,7 +47,6 @@ public class FrankfurterProvider : IExchangeService
         _retryPolicy = retryPolicy;
     }
 
-    /// <inheritdoc/>
     public async Task<IResultContract<GetLatestExRateResultDto>> GetLatestExRateAsync(GetLatestExRateRequestDto request)
     {
         try
@@ -110,7 +87,6 @@ public class FrankfurterProvider : IExchangeService
         }
     }
 
-    /// <inheritdoc/>
     public async Task<IResultContract<ConvertLatestResultDto>> ConvertAsync(ConvertRequestDto request)
     {
         try
@@ -151,9 +127,6 @@ public class FrankfurterProvider : IExchangeService
         }
     }
 
-
-
-    /// <inheritdoc/>
     public async Task<IResultContract<GetRateHistoryResultDto>> GetRateHistoryAsync(GetRateHistoryRequestDto request)
     {
         try
@@ -170,12 +143,10 @@ public class FrankfurterProvider : IExchangeService
                 var response = await _retryPolicy.ExecuteAsync(async () =>
                 {
                     var response = await _httpClient.GetAsync(url);
-
                     if (!response.IsSuccessStatusCode)
                     {
                         cachedData = null;
                     }
-
                     return response;
                 });
 

@@ -1,5 +1,4 @@
-﻿
-namespace CC.Application.Interfaces;
+﻿namespace CC.Application.Interfaces;
 
 /// <summary>
 /// Defines a standardized contract for operation responses, encapsulating success state,

@@ -6,37 +6,35 @@ using CC.Infrastructure.Services.Conversion;
 namespace CC.Infrastructure.Factory;
 
 /// <summary>
-/// Factory class for retrieving an exchange service implementation based on the specified provider.
+/// Factory for retrieving exchange service implementations based on the specified provider.
 /// </summary>
 public class ExchangeServiceFactory : IExchangeServiceFactory
 {
     private readonly IDictionary<ExchangeProvider, IExchangeService> _providers;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="ExchangeServiceFactory"/> class,
-    /// mapping available exchange service implementations to their corresponding providers.
+    /// Initializes the factory by mapping exchange service implementations to their providers.
     /// </summary>
-    /// <param name="services">A collection of exchange service implementations.</param>
+    /// <param name="services">A collection of available exchange service implementations.</param>
     public ExchangeServiceFactory(IEnumerable<IExchangeService> services)
     {
         _providers = new Dictionary<ExchangeProvider, IExchangeService>();
 
         foreach (var service in services)
         {
-            switch (service)
+            if (service is FrankfurterProvider)
             {
-                case FrankfurterProvider:
-                    _providers[ExchangeProvider.Frankfurter] = service;
-                    break;
+                _providers[ExchangeProvider.Frankfurter] = service;
             }
         }
     }
 
     /// <summary>
-    /// Retrieves the exchange service implementation for the specified provider.
+    /// Retrieves the exchange service for the specified provider.
     /// </summary>
-    /// <param name="provider">The exchange provider to retrieve the service for.</param>
-    /// <returns>The corresponding <see cref="IExchangeService"/> implementation.</returns>
+    /// <param name="provider">The exchange provider.</param>
+    /// <returns>The corresponding <see cref="IExchangeService"/>.</returns>
+    /// <exception cref="ArgumentException">Thrown when the provider is not supported.</exception>
     public IExchangeService GetProvider(ExchangeProvider provider)
     {
         if (_providers.TryGetValue(provider, out var service))
@@ -47,4 +45,3 @@ public class ExchangeServiceFactory : IExchangeServiceFactory
         throw new ArgumentException($"Exchange provider '{provider}' is not supported.");
     }
 }
-

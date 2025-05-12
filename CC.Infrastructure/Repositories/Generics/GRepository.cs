@@ -1,525 +1,95 @@
 ﻿using CC.Domain.Interfaces;
 using CC.Infrastructure.DatabaseContext;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace CC.Infrastructure.Repositories.Generics;
 
+/// <summary>
+/// A generic repository that provides basic CRUD operations for entities of type <typeparamref name="T"/>.
+/// </summary>
+/// <remarks>
+/// This repository class implements the <see cref="IGRepository{T}"/> interface and provides standard operations
+/// such as adding, querying, and checking existence of entities in the database. It leverages Entity Framework Core's
+/// <see cref="DbContext"/> for interacting with the underlying database.
+/// </remarks>
+/// <typeparam name="T">The entity type that this repository operates on. It must be a class.</typeparam>
 public class GRepository<T> : IGRepository<T> where T : class
 {
-    #region Private fields
+    #region Private Fields
+
+    /// <summary>
+    /// The database context used to interact with the database.
+    /// </summary>
     protected readonly DbContext _dbContext;
+
+    /// <summary>
+    /// Flag to track whether the repository has been disposed.
+    /// </summary>
     private bool _disposed = false;
+
     #endregion
 
     #region Constructor
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GRepository{T}"/> class with the specified <paramref name="dbContext"/>.
+    /// </summary>
+    /// <param name="dbContext">The <see cref="AppDbContext"/> instance to interact with the database.</param>
     public GRepository(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
+
     #endregion
 
-    #region Add Methods
-    /// <summary>
-    /// Insert single entity 
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    public virtual T Add(T entity)
-    {
-        return _dbContext.Set<T>().Add(entity).Entity;
-    }
+    #region Public Methods
 
     /// <summary>
-    /// Insert single entity asynchronously
+    /// Asynchronously adds a new entity to the database.
     /// </summary>
-    /// <param name="t"></param>
-    /// <returns></returns>
+    /// <param name="t">The entity to add.</param>
+    /// <returns>The added entity.</returns>
     public virtual async Task<T> AddAsync(T t)
     {
+        // Adds the entity asynchronously and returns the added entity.
         var entity = await _dbContext.Set<T>().AddAsync(t);
         return entity.Entity;
     }
 
     /// <summary>
-    /// Insert list of entities
+    /// Asynchronously checks if any record exists that matches the specified condition.
     /// </summary>
-    /// <param name="entities"></param>
-    public virtual void AddRange(IEnumerable<T> entities)
-    {
-        _dbContext.Set<T>().AddRange(entities);
-    }
-
-    /// <summary>
-    /// Insert list of entities asynchronously
-    /// </summary>
-    /// <param name="entities"></param>
-    /// <returns></returns>
-    public virtual async Task AddRangeAsync(IEnumerable<T> entities)
-    {
-        await _dbContext.Set<T>().AddRangeAsync(entities);
-    }
-    #endregion
-
-
-    #region Count Methods
-    /// <summary>
-    /// Retrieve the count of currently exisiting records
-    /// </summary>
-    /// <returns></returns>
-    public int Count()
-    {
-        return _dbContext.Set<T>().Count();
-    }
-
-    /// <summary>
-    /// Retrieve the count of currently exisiting records asynchronously
-    /// </summary>
-    /// <returns></returns>
-
-    public Task<int> CountAsync()
-    {
-        return _dbContext.Set<T>().CountAsync();
-    }
-
-    #endregion
-
-    #region Minimum Methods
-    /// <summary>
-    /// Returns the minimum value of generic IQueryable 
-    /// </summary>
-    /// <returns></returns>
-    public T GetMin()
-    {
-        return _dbContext.Set<T>().Min();
-    }
-    /// <summary>
-    /// Returns the minimum value of generic IQueryable asynchronously
-    /// </summary>
-    /// <returns></returns>
-    public async Task<T> GetMinAsync()
-    {
-        return await _dbContext.Set<T>().MinAsync();
-    }
-
-    /// <summary>
-    /// Returns the minimum value of generic IQueryable using given key
-    /// </summary>
-    /// <param name="selector"></param>
-    /// <returns></returns>
-    public object GetMin(Expression<Func<T, object>> selector)
-    {
-        return _dbContext.Set<T>().Min(selector);
-    }
-
-    /// <summary>
-    /// Returns the minimum value of generic IQueryable using given key asynchronously
-    /// </summary>
-    /// <param name="selector"></param>
-    /// <returns></returns>
-    public async Task<object> GetMinAsync(Expression<Func<T, object>> selector)
-    {
-        return await _dbContext.Set<T>().MinAsync(selector);
-    }
-    #endregion
-
-    #region Maximum Methods
-    /// <summary>
-    /// Returns the maximum value of generic IQueryable
-    /// </summary>
-    /// <returns></returns>
-    public T GetMax()
-    {
-        return _dbContext.Set<T>().Max();
-    }
-
-    /// <summary>
-    /// Returns the maximum value of generic IQueryable asynchronously
-    /// </summary>
-    /// <returns></returns>
-    public async Task<T> GetMaxAsync()
-    {
-        return await _dbContext.Set<T>().MaxAsync();
-    }
-
-    /// <summary>
-    /// Returns the maximum value of generic IQueryable using given key
-    /// </summary>
-    /// <param name="selector"></param>
-    /// <returns></returns>
-    public object GetMax(Expression<Func<T, object>> selector)
-    {
-        return _dbContext.Set<T>().Max(selector);
-    }
-
-    /// <summary>
-    /// Returns the maximum value of generic IQueryable using given key asynchronously
-    /// </summary>
-    /// <param name="selector"></param>
-    /// <returns></returns>
-    public async Task<object> GetMaxAsync(Expression<Func<T, object>> selector)
-    {
-        return await _dbContext.Set<T>().MaxAsync(selector);
-    }
-    #endregion
-
-    #region Find Methods
-    /// <summary>
-    /// Searches for record(s) using given keys
-    /// </summary>
-    /// <param name="keys"></param>
-    /// <returns></returns>
-    public T Find(params object[] keys)
-    {
-        return _dbContext.Set<T>().Find(keys);
-    }
-
-    /// <summary>
-    /// Searches for record(s) using given condition
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public T Find(Func<T, bool> where)
-    {
-        return _dbContext.Set<T>().Find(where);
-    }
-
-    /// <summary>
-    /// Searches for record(s) using given keys asynchronously
-    /// </summary>
-    /// <param name="keys"></param>
-    /// <returns></returns>
-    public async Task<T> FindAsync(params object[] keys)
-    {
-        return await _dbContext.Set<T>().FindAsync(keys);
-    }
-
-    /// <summary>
-    /// Searches for record(s) that match(es) a given condition
-    /// </summary>
-    /// <param name="match"></param>
-    /// <returns></returns>
-    public async Task<T> FindAsync(Expression<Func<T, bool>> match)
-    {
-        return await _dbContext.Set<T>().FindAsync(match);
-    }
-
-    /// <summary>
-    /// Checks if any record exists that matches the specified condition
-    /// </summary>
-    /// <param name="predicate">The condition to test each element against</param>
-    /// <returns>Task<bool> that represents whether any elements satisfy the condition</returns>
+    /// <param name="predicate">The condition to test each element against.</param>
+    /// <returns>A task that represents whether any elements satisfy the condition.</returns>
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
     {
+        // Checks if any entity in the set matches the predicate.
         return await _dbContext.Set<T>().AnyAsync(predicate);
     }
-    #endregion
-
-    #region Get Methods
-    /// <summary>
-    /// Retrieve all records
-    /// </summary>
-    /// <returns></returns>
-    public virtual IQueryable<T> GetAll()
-    {
-        return _dbContext.Set<T>().AsNoTracking();
-    }
 
     /// <summary>
-    /// Retrieve all records based on a given condition
+    /// Retrieves the first record that matches the specified condition, without tracking the entity.
     /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public virtual IQueryable<T> GetAll(Expression<Func<T, bool>> where)
-    {
-        return _dbContext.Set<T>().AsNoTracking().Where(where).AsQueryable();
-    }
-
-    /// <summary>
-    /// Retrieve all records based on a given condition and key
-    /// </summary>
-    /// <param name="where"></param>
-    /// <param name="select"></param>
-    /// <returns></returns>
-    public virtual IQueryable<object> GetAll(Expression<Func<T, bool>> where, Expression<Func<T, object>> select)
-    {
-        var x = _dbContext.Set<T>().AsNoTracking().Where(where).Select(select);
-        return x;
-    }
-
-    /// <summary>
-    /// Retrieve all records asynchronously
-    /// </summary>
-    /// <returns></returns>
-    public virtual async Task<IQueryable<T>> GetAllAsync()
-    {
-        var list = await _dbContext.Set<T>().AsNoTracking().ToListAsync();
-        return list.AsQueryable();
-    }
-
-    /// <summary>
-    /// Retrieve all records based on a given condition asynchronously
-    /// </summary>
-    /// <param name="expression"></param>
-    /// <returns></returns>
-    public virtual async Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> expression)
-    {
-        var list = await _dbContext.Set<T>().AsNoTracking().Where(expression).ToListAsync();
-        return list.AsQueryable();
-    }
-
-    /// <summary>
-    /// Retrieve all records based on a given condition and selector asynchronously
-    /// </summary>
-    /// <param name="where"></param>
-    /// <param name="select"></param>
-    /// <returns></returns>
-    public virtual async Task<IQueryable<object>> GetAllAsync(Expression<Func<T, bool>> where, Expression<Func<T, object>> select)
-    {
-        var list = await _dbContext.Set<T>().AsNoTracking().Where(where).Select(select).ToListAsync();
-        return list.AsQueryable();
-    }
-
-    /// <summary>
-    /// Retrieve all records with set of properties
-    /// </summary>
-    /// <param name="includeProperties"></param>
-    /// <returns></returns>
-    public IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties)
-    {
-        IQueryable<T> queryable = GetAll();
-        foreach (Expression<Func<T, object>> includeProperty in includeProperties)
-        {
-            queryable = queryable.Include(includeProperty);
-        }
-        return queryable;
-    }
-
-    /// <summary>
-    /// Retrieve all records with set of properties asynchronously
-    /// </summary>
-    /// <param name="includeProperties"></param>
-    /// <returns></returns>
-    public async Task<IQueryable<T>> GetAllIncludingAsync(params Expression<Func<T, object>>[] includeProperties)
-    {
-        // need more investigation to avoid actual exeution by tolist()
-        return (await _dbContext.Set<T>().AsNoTracking().Include(includeProperties.ToString()).ToListAsync()).AsQueryable();
-    }
-
-    /// <summary>
-    /// Retrieve the first record
-    /// </summary>
-    /// <returns></returns>
-    public T GetFirst()
-    {
-        return _dbContext.Set<T>().AsNoTracking().First();
-    }
-
-    /// <summary>
-    /// Retrieve the first record asynchronously
-    /// </summary>
-    /// <returns></returns>
-    public async Task<T> GetFirstAsync()
-    {
-        return await _dbContext.Set<T>().AsNoTracking().FirstAsync();
-    }
-
-    /// <summary>
-    /// Retrieve first or default record
-    /// </summary>
-    /// <returns></returns>
-    public T GetFirstOrDefault()
-    {
-        return _dbContext.Set<T>().AsNoTracking().FirstOrDefault();
-    }
-
-    /// <summary>
-    /// Retrieve first or default async
-    /// </summary>
-    /// <returns></returns>
-    public async Task<T> GetFirstOrDefaultAsync()
-    {
-        return await _dbContext.Set<T>().AsNoTracking().FirstOrDefaultAsync();
-    }
-
-    /// <summary>
-    /// Retrieve the first record based on a given condition
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public T GetFirst(Expression<Func<T, bool>> where)
-    {
-        return _dbContext.Set<T>().AsNoTracking().First(where);
-    }
-
-    /// <summary>
-    /// Retrieve the first record based on a given condition asynchronously
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public async Task<T> GetFirstAsync(Expression<Func<T, bool>> where)
-    {
-        return await _dbContext.Set<T>().AsNoTracking().FirstAsync(where);
-    }
-
-    /// <summary>
-    /// Retrieve the first record based on a given condition
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
+    /// <param name="where">The condition to find the record.</param>
+    /// <returns>The first matching entity or null if no match is found.</returns>
     public T GetFirstOrDefault(Expression<Func<T, bool>> where)
     {
+        // Retrieves the first matching entity, without tracking changes.
         return _dbContext.Set<T>().AsNoTracking().FirstOrDefault(where);
     }
 
     /// <summary>
-    /// Retrieve the first record based on a given condition asynchronously
+    /// Asynchronously retrieves the first record that matches the specified condition, without tracking the entity.
     /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
+    /// <param name="where">The condition to find the record.</param>
+    /// <returns>A task representing the first matching entity or null if no match is found.</returns>
     public async Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> where)
     {
+        // Asynchronously retrieves the first matching entity, without tracking changes.
         return await _dbContext.Set<T>().AsNoTracking().FirstOrDefaultAsync(where);
     }
 
-    /// <summary>
-    /// Retrieve the last record
-    /// </summary>
-    /// <returns></returns>
-    public T GetLast()
-    {
-        return _dbContext.Set<T>().AsNoTracking().Last();
-    }
-
-    /// <summary>
-    /// Retrieve the last record asynchronously
-    /// </summary>
-    /// <returns></returns>
-    public async Task<T> GetLastAsync()
-    {
-        return await _dbContext.Set<T>().AsNoTracking().LastAsync();
-    }
-
-    /// <summary>
-    /// Retrieve the last record
-    /// </summary>
-    /// <returns></returns>
-    public T GetLastOrDefault()
-    {
-        return _dbContext.Set<T>().AsNoTracking().LastOrDefault();
-    }
-
-    /// <summary>
-    /// Retrieve the last record asynchronously
-    /// </summary>
-    /// <returns></returns>
-    public async Task<T> GetLastOrDefaultAsync()
-    {
-        return await _dbContext.Set<T>().AsNoTracking().LastOrDefaultAsync();
-    }
-
-    /// <summary>
-    /// Retrieve the last record based on a given condition
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public T GetLast(Expression<Func<T, bool>> where)
-    {
-        return _dbContext.Set<T>().AsNoTracking().Last(where);
-    }
-
-    /// <summary>
-    /// Retrieve the last record based on a given condition asynchronously
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public async Task<T> GetLastAsync(Expression<Func<T, bool>> where)
-    {
-        return await _dbContext.Set<T>().AsNoTracking().LastAsync(where);
-    }
-
-    /// <summary>
-    /// Retrieve the last record based on a given condition
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public T GetLastOrDefault(Expression<Func<T, bool>> where)
-    {
-        return _dbContext.Set<T>().AsNoTracking().LastOrDefault(where);
-    }
-
-    /// <summary>
-    /// Retrieve the last record based on a given condition asynchronously
-    /// </summary>
-    /// <param name="where"></param>
-    /// <returns></returns>
-    public async Task<T> GetLastOrDefaultAsync(Expression<Func<T, bool>> where)
-    {
-        return await _dbContext.Set<T>().AsNoTracking().LastOrDefaultAsync(where);
-    }
-    #endregion
-
-    #region Remove Methods
-    /// <summary>
-    /// Logically or physically deleting record based on the entity type
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    public virtual EntityEntry<T> Remove(T entity)
-    {
-        return _dbContext.Update(entity);
-    }
-
-    /// <summary>
-    /// Logically or physically deleting list of records based on the entity type
-    /// </summary>
-    /// <param name="entities"></param>
-    public virtual void RemoveRange(IEnumerable<T> entities)
-    {
-        _dbContext.Set<T>().RemoveRange(entities);
-    }
-    #endregion
-
-    #region Update Method
-    /// <summary>
-    /// Update record data
-    /// </summary>
-    /// <param name="entity"></param>
-    /// <returns></returns>
-    public virtual EntityEntry<T> Update(T entity)
-    {
-        return _dbContext.Update(entity);
-    }
-    #endregion
-
-    #region Release Unmanaged Resources
-    /// <summary>
-    /// Release un managed resources from memeory
-    /// </summary>
-    /// <param name="disposing"></param>
-    public void Dispose(bool disposing)
-    {
-        if (!_disposed)
-        {
-            if (disposing)
-            {
-                _dbContext.Dispose();
-            }
-        }
-        _disposed = true;
-    }
-
-
-    #endregion
-
-    #region Enum Helpers
-    private enum OrderByType
-    {
-
-        Ascending,
-        Descending
-    }
     #endregion
 }

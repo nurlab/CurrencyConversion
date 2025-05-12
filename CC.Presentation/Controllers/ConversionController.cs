@@ -20,7 +20,7 @@ namespace CC.Presentation.Controllers;
 /// All endpoints return standardized response contracts with consistent error handling.
 /// </remarks>
 [ApiController]
-[Route("api/v{version:apiVersion}/[controller]")] // Added API versioning to the route
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
 public class ConversionController : ControllerBase
 {
@@ -30,6 +30,14 @@ public class ConversionController : ControllerBase
     private readonly IConversionService conversionService;
     private readonly IConversionValidator validator;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ConversionController"/> class.
+    /// </summary>
+    /// <param name="convertLatestResponse">Service to format the currency conversion response.</param>
+    /// <param name="getRateHistoryResponse">Service to format the rate history response.</param>
+    /// <param name="getLatestExRateResponse">Service to format the latest exchange rate response.</param>
+    /// <param name="conversionService">Service that handles conversion and exchange rate operations.</param>
+    /// <param name="validator">Validator for conversion-related request contracts.</param>
     public ConversionController(
         IResponseContract<ConvertLatestResponseContract> convertLatestResponse,
         IResponseContract<GetRateHistoryResponseContract> getRateHistoryResponse,
@@ -47,7 +55,7 @@ public class ConversionController : ControllerBase
     /// <summary>
     /// Gets the latest exchange rates for a specified base currency.
     /// </summary>
-    /// <param name="request">Request containing the base currency code</param>
+    /// <param name="request">Request containing the base currency code.</param>
     /// <returns>
     /// Response containing:
     /// <list type="bullet">
@@ -57,13 +65,15 @@ public class ConversionController : ControllerBase
     /// </returns>
     [HttpPost("get-latest-exchange-rate", Name = "Get Latest Exchange Rate")]
     [ProducesResponseType(typeof(GetLatestExRateResponseContract), StatusCodes.Status200OK)]
-    [Authorize(Roles = "Admin")] // Restrict to Admin role only
+    [Authorize(Roles = "Admin")]
     public async Task<IResponseContract<GetLatestExRateResponseContract>> GetLatestExchangeRate([FromBody] GetLatestExRateRequestContract request)
     {
         try
         {
             var validationResponse = validator.Validate(request);
-            if (!validationResponse.IsSuccess) return getLatestExRateResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
+            if (!validationResponse.IsSuccess)
+                return getLatestExRateResponse.ProcessErrorResponse(validationResponse.Messages, validationResponse.ErrorCode);
+
             var res = await conversionService.GetLatestExchangeRateAsync(request);
             return res;
         }
@@ -76,7 +86,7 @@ public class ConversionController : ControllerBase
     /// <summary>
     /// Converts an amount from one currency to another.
     /// </summary>
-    /// <param name="request">Request containing conversion details</param>
+    /// <param name="request">Request containing conversion details.</param>
     /// <returns>
     /// Response containing:
     /// <list type="bullet">
@@ -90,16 +100,20 @@ public class ConversionController : ControllerBase
     public async Task<IResponseContract<ConvertLatestResponseContract>> Convert([FromBody] ConvertLatestRequestContract request)
     {
         var validationResult = validator.Validate(request);
-        if (request.FromCurrency == request.ToCurrency) return convertLatestResponse.ProcessSuccessResponse(new ConvertLatestResponseContract(request.Amount, request.ToCurrency));
+        if (request.FromCurrency == request.ToCurrency)
+            return convertLatestResponse.ProcessSuccessResponse(
+                new ConvertLatestResponseContract(request.Amount, request.ToCurrency));
 
-        if (!validationResult.IsSuccess) return convertLatestResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
+        if (!validationResult.IsSuccess)
+            return convertLatestResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
+
         return await conversionService.ConvertAsync(request);
     }
 
     /// <summary>
     /// Gets historical exchange rates for a specified date range.
     /// </summary>
-    /// <param name="request">Request containing query parameters</param>
+    /// <param name="request">Request containing query parameters.</param>
     /// <returns>
     /// Response containing:
     /// <list type="bullet">
@@ -113,7 +127,9 @@ public class ConversionController : ControllerBase
     public async Task<IResponseContract<GetRateHistoryResponseContract>> GetRateHistory([FromBody] GetRateHistoryRequestContract request)
     {
         var validationResult = validator.Validate(request);
-        if (!validationResult.IsSuccess) return getRateHistoryResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
+        if (!validationResult.IsSuccess)
+            return getRateHistoryResponse.ProcessErrorResponse(validationResult.Messages, validationResult.ErrorCode);
+
         return await conversionService.GetRateHistoryAsync(request);
     }
 }

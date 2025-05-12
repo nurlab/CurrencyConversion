@@ -10,15 +10,29 @@ using Microsoft.Extensions.Options;
 
 namespace CC.Application.Services.Account;
 
-public class AccountService(IResponseContract<SigninResponseContract> signinResponse
-    , IResponseContract<SignupResponseContract> signupResponse
-    , IOptions<SecuritySettings> securitySettings
-    , IUserRepository userRepository
-    , IMapper mapper
-    , IUnitOfWork uow
-    ) : IAccountService
+/// <summary>
+/// Service for managing account-related operations such as sign-in and sign-up.
+/// </summary>
+/// <remarks>
+/// Uses injected dependencies for user data access, response wrapping, password encryption, token generation, and unit of work handling.
+/// </remarks>
+public class AccountService(
+    IResponseContract<SigninResponseContract> signinResponse,
+    IResponseContract<SignupResponseContract> signupResponse,
+    IOptions<SecuritySettings> securitySettings,
+    IUserRepository userRepository,
+    IMapper mapper,
+    IUnitOfWork uow
+) : IAccountService
 {
-
+    /// <summary>
+    /// Signs in a user based on the provided credentials.
+    /// </summary>
+    /// <param name="request">The sign-in request containing username and password.</param>
+    /// <returns>
+    /// A response contract containing user information and JWT token if credentials are valid,
+    /// or an error message if authentication fails.
+    /// </returns>
     public async Task<IResponseContract<SigninResponseContract>> Signin(SigninRequestContract request)
     {
         try
@@ -45,6 +59,14 @@ public class AccountService(IResponseContract<SigninResponseContract> signinResp
         }
     }
 
+    /// <summary>
+    /// Registers a new user account using the provided registration details.
+    /// </summary>
+    /// <param name="request">The sign-up request containing username, password, and role.</param>
+    /// <returns>
+    /// A response contract containing the newly created user information if registration is successful,
+    /// or an error message if the operation fails.
+    /// </returns>
     public async Task<IResponseContract<SignupResponseContract>> Signup(SignupRequestContract request)
     {
         try
@@ -72,5 +94,4 @@ public class AccountService(IResponseContract<SigninResponseContract> signinResp
             await uow.DisposeAsync();
         }
     }
-
 }

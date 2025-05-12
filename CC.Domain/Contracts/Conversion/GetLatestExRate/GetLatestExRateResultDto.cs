@@ -2,7 +2,6 @@
 
 namespace CC.Domain.Contracts.Conversion;
 
-
 /// <summary>
 /// Represents the response structure from an external exchange rate API.
 /// </summary>
@@ -20,9 +19,10 @@ public class GetLatestExRateResultDto
     /// <exception cref="ArgumentNullException">Thrown when currency is null.</exception>
     public GetLatestExRateResultDto(Dictionary<string, decimal> rates, string currency)
     {
-        Rates = rates;
-        Currency = currency;
+        Rates = rates ?? throw new ArgumentNullException(nameof(rates));
+        Currency = currency ?? throw new ArgumentNullException(nameof(currency));
     }
+
     public GetLatestExRateResultDto() { }
 
     /// <summary>
@@ -66,5 +66,4 @@ public class GetLatestExRateResultDto
     /// </value>
     [JsonPropertyName("rates")]
     public Dictionary<string, decimal> Rates { get; set; } = new();
-
 }

@@ -1,6 +1,5 @@
 ﻿using AspNetCoreRateLimit;
 using Autofac;
-using Microsoft.AspNetCore.Mvc;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CC.Application;
@@ -8,16 +7,16 @@ using CC.Application.Configrations;
 using CC.Infrastructure;
 using CC.Infrastructure.DatabaseContext;
 using CC.Presentation;
-using CC.Presentation.Helper;
 using CC.Presentation.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.AspNetCore.Mvc.Versioning;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -40,7 +39,6 @@ builder.Services.AddSwaggerGen(options =>
     });
 
     options.UseInlineDefinitionsForEnums(); // optional
-    options.SchemaFilter<EnumSchemaFilter>();
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
         Scheme = "bearer",

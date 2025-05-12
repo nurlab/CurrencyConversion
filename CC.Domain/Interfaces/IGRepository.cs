@@ -1,56 +1,39 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace CC.Domain.Interfaces
 {
+    /// <summary>
+    /// Defines a contract for generic repository operations.
+    /// </summary>
+    /// <typeparam name="T">The type of entity this repository will operate on.</typeparam>
     public interface IGRepository<T> where T : class
     {
-        T Add(T entity);
+        /// <summary>
+        /// Adds a new entity asynchronously to the repository.
+        /// </summary>
+        /// <param name="t">The entity to add.</param>
+        /// <returns>The added entity.</returns>
         Task<T> AddAsync(T t);
-        void AddRange(IEnumerable<T> entities);
-        Task AddRangeAsync(IEnumerable<T> entities);
+
+        /// <summary>
+        /// Checks if any entity in the repository matches the given predicate.
+        /// </summary>
+        /// <param name="predicate">The condition to evaluate for entity matching.</param>
+        /// <returns><c>true</c> if any entity matches the predicate; otherwise, <c>false</c>.</returns>
         Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
-        int Count();
-        Task<int> CountAsync();
-        void Dispose(bool disposing);
-        T Find(Func<T, bool> where);
-        T Find(params object[] keys);
-        Task<T> FindAsync(Expression<Func<T, bool>> match);
-        Task<T> FindAsync(params object[] keys);
-        IQueryable<T> GetAll();
-        IQueryable<T> GetAll(Expression<Func<T, bool>> where);
-        IQueryable<object> GetAll(Expression<Func<T, bool>> where, Expression<Func<T, object>> select);
-        Task<IQueryable<T>> GetAllAsync();
-        Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>> expression);
-        Task<IQueryable<object>> GetAllAsync(Expression<Func<T, bool>> where, Expression<Func<T, object>> select);
-        IQueryable<T> GetAllIncluding(params Expression<Func<T, object>>[] includeProperties);
-        Task<IQueryable<T>> GetAllIncludingAsync(params Expression<Func<T, object>>[] includeProperties);
-        T GetFirst();
-        T GetFirst(Expression<Func<T, bool>> where);
-        Task<T> GetFirstAsync();
-        Task<T> GetFirstAsync(Expression<Func<T, bool>> where);
-        T GetFirstOrDefault();
+
+        /// <summary>
+        /// Gets the first entity that matches the specified condition or returns <c>null</c> if no match is found.
+        /// </summary>
+        /// <param name="where">The condition to filter entities.</param>
+        /// <returns>The first entity that matches the condition, or <c>null</c> if no match is found.</returns>
         T GetFirstOrDefault(Expression<Func<T, bool>> where);
-        Task<T> GetFirstOrDefaultAsync();
+
+        /// <summary>
+        /// Asynchronously gets the first entity that matches the specified condition or returns <c>null</c> if no match is found.
+        /// </summary>
+        /// <param name="where">The condition to filter entities.</param>
+        /// <returns>A task that represents the asynchronous operation. The task result contains the first entity that matches the condition, or <c>null</c> if no match is found.</returns>
         Task<T> GetFirstOrDefaultAsync(Expression<Func<T, bool>> where);
-        T GetLast();
-        T GetLast(Expression<Func<T, bool>> where);
-        Task<T> GetLastAsync();
-        Task<T> GetLastAsync(Expression<Func<T, bool>> where);
-        T GetLastOrDefault();
-        T GetLastOrDefault(Expression<Func<T, bool>> where);
-        Task<T> GetLastOrDefaultAsync();
-        Task<T> GetLastOrDefaultAsync(Expression<Func<T, bool>> where);
-        T GetMax();
-        object GetMax(Expression<Func<T, object>> selector);
-        Task<T> GetMaxAsync();
-        Task<object> GetMaxAsync(Expression<Func<T, object>> selector);
-        T GetMin();
-        object GetMin(Expression<Func<T, object>> selector);
-        Task<T> GetMinAsync();
-        Task<object> GetMinAsync(Expression<Func<T, object>> selector);
-        EntityEntry<T> Remove(T entity);
-        void RemoveRange(IEnumerable<T> entities);
-        EntityEntry<T> Update(T entity);
     }
 }

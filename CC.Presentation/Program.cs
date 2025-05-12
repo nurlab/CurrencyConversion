@@ -1,5 +1,6 @@
 ﻿using AspNetCoreRateLimit;
 using Autofac;
+using Microsoft.AspNetCore.Mvc;
 using Autofac.Extensions.DependencyInjection;
 using AutoMapper;
 using CC.Application;
@@ -16,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Security.Cryptography.X509Certificates;
+using Microsoft.AspNetCore.Mvc.Versioning;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -161,7 +163,18 @@ builder.Host.UseSerilog((context, services, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 #endregion
 
-
+#region API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.ApiVersionReader = ApiVersionReader.Combine(
+        new QueryStringApiVersionReader("api-version"),
+        new HeaderApiVersionReader("x-api-version")
+    );
+});
+#endregion
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

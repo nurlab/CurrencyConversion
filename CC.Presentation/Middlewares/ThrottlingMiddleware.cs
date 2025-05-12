@@ -16,7 +16,7 @@
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var clientIp = context.Connection.RemoteIpAddress?.ToString(); // Can also use API key or user ID
+            var clientIp = context.Connection.RemoteIpAddress?.ToString();
             if (clientIp == null)
             {
                 context.Response.StatusCode = 400;
@@ -30,7 +30,7 @@
             }
 
             var requestTimes = RequestLog[clientIp];
-            requestTimes.RemoveAll(r => r < DateTime.UtcNow - _timeWindow); // Remove outdated requests
+            requestTimes.RemoveAll(r => r < DateTime.UtcNow - _timeWindow);
 
             if (requestTimes.Count >= _maxRequestsPerMinute)
             {

@@ -42,6 +42,7 @@ public class ConversionController(IResponseContract<ConvertLatestResponseContrac
     /// </returns>
     [HttpPost("get-latest-exchange-rate", Name = "Get Latest Exchange Rate")]
     [ProducesResponseType(typeof(GetLatestExRateResponseContract), StatusCodes.Status200OK)]
+    [Authorize(Roles = "Admin")] // Restrict to Admin role only
     public async Task<IResponseContract<GetLatestExRateResponseContract>> GetLatestExchangeRate([FromBody] GetLatestExRateRequestContract request)
     {
         try
@@ -70,6 +71,7 @@ public class ConversionController(IResponseContract<ConvertLatestResponseContrac
     /// </list>
     /// </returns>
     [HttpPost("convert", Name = "Convert")]
+    [Authorize(Roles = "Manager")]
     [ProducesResponseType(typeof(ConvertLatestResponseContract), StatusCodes.Status200OK)]
     public async Task<IResponseContract<ConvertLatestResponseContract>> Convert([FromBody] ConvertLatestRequestContract request)
     {
@@ -93,6 +95,7 @@ public class ConversionController(IResponseContract<ConvertLatestResponseContrac
     /// </returns>
     [HttpPost("get-rate-history", Name = "Get Rate History")]
     [ProducesResponseType(typeof(GetRateHistoryResponseContract), StatusCodes.Status200OK)]
+    [Authorize(Roles = "User")]
     public async Task<IResponseContract<GetRateHistoryResponseContract>> GetRateHistory([FromBody] GetRateHistoryRequestContract request)
     {
         var validationResult = validator.Validate(request);
